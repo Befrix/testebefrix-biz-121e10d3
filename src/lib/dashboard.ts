@@ -36,7 +36,7 @@ export const NAV_ITEMS: NavItem[] = [
   { to: "/dashboard/eventos", label: "Eventos", icon: CalendarDays, group: "ops" },
   { to: "/dashboard/uploads", label: "Uploads", icon: Upload, group: "ops" },
   { to: "/dashboard/integracoes", label: "Integrações", icon: Plug, group: "ops" },
-  { to: "/dashboard/billing", label: "Billing", icon: CreditCard, group: "ops" },
+  { to: "/dashboard/pagamentos", label: "Pagamentos", icon: CreditCard, group: "ops" },
 ];
 
 export const NAV_GROUPS: { key: NavItem["group"]; label: string }[] = [
