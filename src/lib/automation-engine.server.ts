@@ -102,12 +102,53 @@ async function runAction(action: Action, ctx: Ctx): Promise<{ ok: boolean; info?
       case "webhook_call": {
         const url = action.url as string | undefined;
         if (!url) return { ok: false, error: "missing url" };
+        // SSRF protection: validate URL is a safe public HTTPS endpoint
+        let parsed: URL;
         try {
-          await fetch(url, {
+          parsed = new URL(url);
+        } catch {
+          return { ok: false, error: "invalid url" };
+        }
+        if (parsed.protocol !== "https:") {
+          return { ok: false, error: "only https webhooks are allowed" };
+        }
+        const host = parsed.hostname.toLowerCase();
+        // Block loopback, link-local, cloud metadata, and private RFC1918 ranges
+        const blockedHosts = ["localhost", "metadata.google.internal", "metadata.goog"];
+        if (blockedHosts.includes(host)) {
+          return { ok: false, error: "blocked host" };
+        }
+        // Block IP literals targeting internal ranges
+        const ipv4 = host.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
+        if (ipv4) {
+          const [a, b] = [Number(ipv4[1]), Number(ipv4[2])];
+          if (
+            a === 10 ||
+            a === 127 ||
+            a === 0 ||
+            (a === 169 && b === 254) ||
+            (a === 172 && b >= 16 && b <= 31) ||
+            (a === 192 && b === 168) ||
+            a >= 224
+          ) {
+            return { ok: false, error: "blocked ip range" };
+          }
+        }
+        // Block IPv6 literals entirely (covers ::1, fc00::/7, fe80::/10, etc.)
+        if (host.includes(":") || host.startsWith("[")) {
+          return { ok: false, error: "ipv6 not allowed" };
+        }
+        try {
+          const controller = new AbortController();
+          const timeout = setTimeout(() => controller.abort(), 5000);
+          await fetch(parsed.toString(), {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ event: ctx.event, payload: ctx.payload }),
+            redirect: "error",
+            signal: controller.signal,
           });
+          clearTimeout(timeout);
           return { ok: true };
         } catch (e) {
           return { ok: false, error: e instanceof Error ? e.message : "webhook error" };
