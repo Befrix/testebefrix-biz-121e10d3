@@ -18,6 +18,7 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as AdminUsuariosRouteImport } from './routes/admin/usuarios'
+import { Route as AdminPlanosRouteImport } from './routes/admin/planos'
 import { Route as AdminDashboardRouteImport } from './routes/admin/dashboard'
 import { Route as AdminClientesRouteImport } from './routes/admin/clientes'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
@@ -78,6 +79,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
 const AdminUsuariosRoute = AdminUsuariosRouteImport.update({
   id: '/usuarios',
   path: '/usuarios',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPlanosRoute = AdminPlanosRouteImport.update({
+  id: '/planos',
+  path: '/planos',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminDashboardRoute = AdminDashboardRouteImport.update({
@@ -190,6 +196,7 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/admin/clientes': typeof AdminClientesRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/planos': typeof AdminPlanosRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
   '/admin/': typeof AdminIndexRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
@@ -215,6 +222,7 @@ export interface FileRoutesByTo {
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/admin/clientes': typeof AdminClientesRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/planos': typeof AdminPlanosRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
   '/admin': typeof AdminIndexRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
@@ -244,6 +252,7 @@ export interface FileRoutesById {
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/admin/clientes': typeof AdminClientesRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/planos': typeof AdminPlanosRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
   '/admin/': typeof AdminIndexRoute
   '/_authenticated/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
@@ -273,6 +282,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/admin/clientes'
     | '/admin/dashboard'
+    | '/admin/planos'
     | '/admin/usuarios'
     | '/admin/'
     | '/dashboard/analytics'
@@ -298,6 +308,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/admin/clientes'
     | '/admin/dashboard'
+    | '/admin/planos'
     | '/admin/usuarios'
     | '/admin'
     | '/dashboard/analytics'
@@ -326,6 +337,7 @@ export interface FileRouteTypes {
     | '/_authenticated/onboarding'
     | '/admin/clientes'
     | '/admin/dashboard'
+    | '/admin/planos'
     | '/admin/usuarios'
     | '/admin/'
     | '/_authenticated/dashboard/analytics'
@@ -416,6 +428,13 @@ declare module '@tanstack/react-router' {
       path: '/usuarios'
       fullPath: '/admin/usuarios'
       preLoaderRoute: typeof AdminUsuariosRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/planos': {
+      id: '/admin/planos'
+      path: '/planos'
+      fullPath: '/admin/planos'
+      preLoaderRoute: typeof AdminPlanosRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/dashboard': {
@@ -600,6 +619,7 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 interface AdminRouteChildren {
   AdminClientesRoute: typeof AdminClientesRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
+  AdminPlanosRoute: typeof AdminPlanosRoute
   AdminUsuariosRoute: typeof AdminUsuariosRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
@@ -607,6 +627,7 @@ interface AdminRouteChildren {
 const AdminRouteChildren: AdminRouteChildren = {
   AdminClientesRoute: AdminClientesRoute,
   AdminDashboardRoute: AdminDashboardRoute,
+  AdminPlanosRoute: AdminPlanosRoute,
   AdminUsuariosRoute: AdminUsuariosRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
