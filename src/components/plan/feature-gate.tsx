@@ -33,7 +33,7 @@ export function FeatureGate({ flag, channel, children, fallback, title, descript
       <h3 className="text-base font-semibold">{title ?? "Disponível em planos superiores"}</h3>
       <p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">{description ?? cta}</p>
       <Button asChild className="mt-4 bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-glow-primary">
-        <Link to="/dashboard/billing">Ver planos</Link>
+        <Link to="/dashboard/pagamentos">Ver planos</Link>
       </Button>
     </div>
   );
