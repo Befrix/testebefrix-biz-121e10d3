@@ -30,13 +30,13 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
 import { Route as AuthenticatedDashboardUploadsRouteImport } from './routes/_authenticated/dashboard.uploads'
 import { Route as AuthenticatedDashboardSequenciasRouteImport } from './routes/_authenticated/dashboard.sequencias'
+import { Route as AuthenticatedDashboardPagamentosRouteImport } from './routes/_authenticated/dashboard.pagamentos'
 import { Route as AuthenticatedDashboardLeadsRouteImport } from './routes/_authenticated/dashboard.leads'
 import { Route as AuthenticatedDashboardInteligenciaRouteImport } from './routes/_authenticated/dashboard.inteligencia'
 import { Route as AuthenticatedDashboardIntegracoesRouteImport } from './routes/_authenticated/dashboard.integracoes'
 import { Route as AuthenticatedDashboardInboxRouteImport } from './routes/_authenticated/dashboard.inbox'
 import { Route as AuthenticatedDashboardEventosRouteImport } from './routes/_authenticated/dashboard.eventos'
 import { Route as AuthenticatedDashboardCampanhasRouteImport } from './routes/_authenticated/dashboard.campanhas'
-import { Route as AuthenticatedDashboardBillingRouteImport } from './routes/_authenticated/dashboard.billing'
 import { Route as AuthenticatedDashboardAutomationsRouteImport } from './routes/_authenticated/dashboard.automations'
 import { Route as AuthenticatedDashboardAutomacoesRouteImport } from './routes/_authenticated/dashboard.automacoes'
 import { Route as AuthenticatedDashboardAnalyticsRouteImport } from './routes/_authenticated/dashboard.analytics'
@@ -148,6 +148,12 @@ const AuthenticatedDashboardSequenciasRoute =
     path: '/sequencias',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const AuthenticatedDashboardPagamentosRoute =
+  AuthenticatedDashboardPagamentosRouteImport.update({
+    id: '/pagamentos',
+    path: '/pagamentos',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const AuthenticatedDashboardLeadsRoute =
   AuthenticatedDashboardLeadsRouteImport.update({
     id: '/leads',
@@ -182,12 +188,6 @@ const AuthenticatedDashboardCampanhasRoute =
   AuthenticatedDashboardCampanhasRouteImport.update({
     id: '/campanhas',
     path: '/campanhas',
-    getParentRoute: () => AuthenticatedDashboardRoute,
-  } as any)
-const AuthenticatedDashboardBillingRoute =
-  AuthenticatedDashboardBillingRouteImport.update({
-    id: '/billing',
-    path: '/billing',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
 const AuthenticatedDashboardAutomationsRoute =
@@ -230,13 +230,13 @@ export interface FileRoutesByFullPath {
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/automacoes': typeof AuthenticatedDashboardAutomacoesRoute
   '/dashboard/automations': typeof AuthenticatedDashboardAutomationsRoute
-  '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
   '/dashboard/campanhas': typeof AuthenticatedDashboardCampanhasRoute
   '/dashboard/eventos': typeof AuthenticatedDashboardEventosRoute
   '/dashboard/inbox': typeof AuthenticatedDashboardInboxRoute
   '/dashboard/integracoes': typeof AuthenticatedDashboardIntegracoesRoute
   '/dashboard/inteligencia': typeof AuthenticatedDashboardInteligenciaRoute
   '/dashboard/leads': typeof AuthenticatedDashboardLeadsRoute
+  '/dashboard/pagamentos': typeof AuthenticatedDashboardPagamentosRoute
   '/dashboard/sequencias': typeof AuthenticatedDashboardSequenciasRoute
   '/dashboard/uploads': typeof AuthenticatedDashboardUploadsRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
@@ -260,13 +260,13 @@ export interface FileRoutesByTo {
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/automacoes': typeof AuthenticatedDashboardAutomacoesRoute
   '/dashboard/automations': typeof AuthenticatedDashboardAutomationsRoute
-  '/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
   '/dashboard/campanhas': typeof AuthenticatedDashboardCampanhasRoute
   '/dashboard/eventos': typeof AuthenticatedDashboardEventosRoute
   '/dashboard/inbox': typeof AuthenticatedDashboardInboxRoute
   '/dashboard/integracoes': typeof AuthenticatedDashboardIntegracoesRoute
   '/dashboard/inteligencia': typeof AuthenticatedDashboardInteligenciaRoute
   '/dashboard/leads': typeof AuthenticatedDashboardLeadsRoute
+  '/dashboard/pagamentos': typeof AuthenticatedDashboardPagamentosRoute
   '/dashboard/sequencias': typeof AuthenticatedDashboardSequenciasRoute
   '/dashboard/uploads': typeof AuthenticatedDashboardUploadsRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
@@ -294,13 +294,13 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/_authenticated/dashboard/automacoes': typeof AuthenticatedDashboardAutomacoesRoute
   '/_authenticated/dashboard/automations': typeof AuthenticatedDashboardAutomationsRoute
-  '/_authenticated/dashboard/billing': typeof AuthenticatedDashboardBillingRoute
   '/_authenticated/dashboard/campanhas': typeof AuthenticatedDashboardCampanhasRoute
   '/_authenticated/dashboard/eventos': typeof AuthenticatedDashboardEventosRoute
   '/_authenticated/dashboard/inbox': typeof AuthenticatedDashboardInboxRoute
   '/_authenticated/dashboard/integracoes': typeof AuthenticatedDashboardIntegracoesRoute
   '/_authenticated/dashboard/inteligencia': typeof AuthenticatedDashboardInteligenciaRoute
   '/_authenticated/dashboard/leads': typeof AuthenticatedDashboardLeadsRoute
+  '/_authenticated/dashboard/pagamentos': typeof AuthenticatedDashboardPagamentosRoute
   '/_authenticated/dashboard/sequencias': typeof AuthenticatedDashboardSequenciasRoute
   '/_authenticated/dashboard/uploads': typeof AuthenticatedDashboardUploadsRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
@@ -328,13 +328,13 @@ export interface FileRouteTypes {
     | '/dashboard/analytics'
     | '/dashboard/automacoes'
     | '/dashboard/automations'
-    | '/dashboard/billing'
     | '/dashboard/campanhas'
     | '/dashboard/eventos'
     | '/dashboard/inbox'
     | '/dashboard/integracoes'
     | '/dashboard/inteligencia'
     | '/dashboard/leads'
+    | '/dashboard/pagamentos'
     | '/dashboard/sequencias'
     | '/dashboard/uploads'
     | '/dashboard/'
@@ -358,13 +358,13 @@ export interface FileRouteTypes {
     | '/dashboard/analytics'
     | '/dashboard/automacoes'
     | '/dashboard/automations'
-    | '/dashboard/billing'
     | '/dashboard/campanhas'
     | '/dashboard/eventos'
     | '/dashboard/inbox'
     | '/dashboard/integracoes'
     | '/dashboard/inteligencia'
     | '/dashboard/leads'
+    | '/dashboard/pagamentos'
     | '/dashboard/sequencias'
     | '/dashboard/uploads'
     | '/dashboard'
@@ -391,13 +391,13 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/analytics'
     | '/_authenticated/dashboard/automacoes'
     | '/_authenticated/dashboard/automations'
-    | '/_authenticated/dashboard/billing'
     | '/_authenticated/dashboard/campanhas'
     | '/_authenticated/dashboard/eventos'
     | '/_authenticated/dashboard/inbox'
     | '/_authenticated/dashboard/integracoes'
     | '/_authenticated/dashboard/inteligencia'
     | '/_authenticated/dashboard/leads'
+    | '/_authenticated/dashboard/pagamentos'
     | '/_authenticated/dashboard/sequencias'
     | '/_authenticated/dashboard/uploads'
     | '/_authenticated/dashboard/'
@@ -562,6 +562,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardSequenciasRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/dashboard/pagamentos': {
+      id: '/_authenticated/dashboard/pagamentos'
+      path: '/pagamentos'
+      fullPath: '/dashboard/pagamentos'
+      preLoaderRoute: typeof AuthenticatedDashboardPagamentosRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/_authenticated/dashboard/leads': {
       id: '/_authenticated/dashboard/leads'
       path: '/leads'
@@ -604,13 +611,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardCampanhasRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
-    '/_authenticated/dashboard/billing': {
-      id: '/_authenticated/dashboard/billing'
-      path: '/billing'
-      fullPath: '/dashboard/billing'
-      preLoaderRoute: typeof AuthenticatedDashboardBillingRouteImport
-      parentRoute: typeof AuthenticatedDashboardRoute
-    }
     '/_authenticated/dashboard/automations': {
       id: '/_authenticated/dashboard/automations'
       path: '/automations'
@@ -639,13 +639,13 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardAnalyticsRoute: typeof AuthenticatedDashboardAnalyticsRoute
   AuthenticatedDashboardAutomacoesRoute: typeof AuthenticatedDashboardAutomacoesRoute
   AuthenticatedDashboardAutomationsRoute: typeof AuthenticatedDashboardAutomationsRoute
-  AuthenticatedDashboardBillingRoute: typeof AuthenticatedDashboardBillingRoute
   AuthenticatedDashboardCampanhasRoute: typeof AuthenticatedDashboardCampanhasRoute
   AuthenticatedDashboardEventosRoute: typeof AuthenticatedDashboardEventosRoute
   AuthenticatedDashboardInboxRoute: typeof AuthenticatedDashboardInboxRoute
   AuthenticatedDashboardIntegracoesRoute: typeof AuthenticatedDashboardIntegracoesRoute
   AuthenticatedDashboardInteligenciaRoute: typeof AuthenticatedDashboardInteligenciaRoute
   AuthenticatedDashboardLeadsRoute: typeof AuthenticatedDashboardLeadsRoute
+  AuthenticatedDashboardPagamentosRoute: typeof AuthenticatedDashboardPagamentosRoute
   AuthenticatedDashboardSequenciasRoute: typeof AuthenticatedDashboardSequenciasRoute
   AuthenticatedDashboardUploadsRoute: typeof AuthenticatedDashboardUploadsRoute
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
@@ -658,7 +658,6 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
       AuthenticatedDashboardAutomacoesRoute,
     AuthenticatedDashboardAutomationsRoute:
       AuthenticatedDashboardAutomationsRoute,
-    AuthenticatedDashboardBillingRoute: AuthenticatedDashboardBillingRoute,
     AuthenticatedDashboardCampanhasRoute: AuthenticatedDashboardCampanhasRoute,
     AuthenticatedDashboardEventosRoute: AuthenticatedDashboardEventosRoute,
     AuthenticatedDashboardInboxRoute: AuthenticatedDashboardInboxRoute,
@@ -667,6 +666,8 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
     AuthenticatedDashboardInteligenciaRoute:
       AuthenticatedDashboardInteligenciaRoute,
     AuthenticatedDashboardLeadsRoute: AuthenticatedDashboardLeadsRoute,
+    AuthenticatedDashboardPagamentosRoute:
+      AuthenticatedDashboardPagamentosRoute,
     AuthenticatedDashboardSequenciasRoute:
       AuthenticatedDashboardSequenciasRoute,
     AuthenticatedDashboardUploadsRoute: AuthenticatedDashboardUploadsRoute,
@@ -730,3 +731,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
