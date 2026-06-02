@@ -735,6 +735,30 @@ export type Database = {
         }
         Relationships: []
       }
+      platform_settings: {
+        Row: {
+          description: string | null
+          key: string
+          updated_at: string
+          updated_by: string | null
+          value: Json
+        }
+        Insert: {
+          description?: string | null
+          key: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: Json
+        }
+        Update: {
+          description?: string | null
+          key?: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: Json
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -918,6 +942,54 @@ export type Database = {
           },
         ]
       }
+      workflow_runs: {
+        Row: {
+          created_at: string
+          error: string | null
+          finished_at: string | null
+          id: string
+          n8n_execution_id: string | null
+          payload: Json
+          result: Json
+          started_at: string
+          status: string
+          tenant_id: string
+          trigger_source: string
+          workflow_id: string | null
+          workflow_name: string | null
+        }
+        Insert: {
+          created_at?: string
+          error?: string | null
+          finished_at?: string | null
+          id?: string
+          n8n_execution_id?: string | null
+          payload?: Json
+          result?: Json
+          started_at?: string
+          status?: string
+          tenant_id: string
+          trigger_source?: string
+          workflow_id?: string | null
+          workflow_name?: string | null
+        }
+        Update: {
+          created_at?: string
+          error?: string | null
+          finished_at?: string | null
+          id?: string
+          n8n_execution_id?: string | null
+          payload?: Json
+          result?: Json
+          started_at?: string
+          status?: string
+          tenant_id?: string
+          trigger_source?: string
+          workflow_id?: string | null
+          workflow_name?: string | null
+        }
+        Relationships: []
+      }
       workflows: {
         Row: {
           created_at: string
@@ -970,10 +1042,17 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_platform_admin: { Args: { _user_id: string }; Returns: boolean }
       is_tenant_member: { Args: { _tenant_id: string }; Returns: boolean }
     }
     Enums: {
-      app_role: "owner" | "admin" | "manager" | "sdr" | "viewer"
+      app_role:
+        | "owner"
+        | "admin"
+        | "manager"
+        | "sdr"
+        | "viewer"
+        | "platform_admin"
       channel: "email" | "whatsapp" | "linkedin"
       lead_status:
         | "new"
@@ -1116,7 +1195,14 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["owner", "admin", "manager", "sdr", "viewer"],
+      app_role: [
+        "owner",
+        "admin",
+        "manager",
+        "sdr",
+        "viewer",
+        "platform_admin",
+      ],
       channel: ["email", "whatsapp", "linkedin"],
       lead_status: [
         "new",
