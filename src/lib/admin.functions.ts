@@ -178,7 +178,7 @@ export const togglePlatformAdmin = createServerFn({ method: "POST" })
       const { data: prof } = await sb.from("profiles").select("tenant_id").eq("id", data.user_id).single();
       const { error } = await sb
         .from("user_roles")
-        .insert({ user_id: data.user_id, tenant_id: prof?.tenant_id, role: "platform_admin" as any });
+        .insert({ user_id: data.user_id, tenant_id: prof?.tenant_id as string, role: "platform_admin" as any });
       if (error && !error.message.includes("duplicate")) throw new Error(error.message);
     } else {
       const { error } = await sb
@@ -341,7 +341,7 @@ export const updatePlatformSetting = createServerFn({ method: "POST" })
     const sb = await admin();
     const { error } = await sb
       .from("platform_settings")
-      .upsert({ key: data.key, value: data.value, updated_at: new Date().toISOString(), updated_by: context.userId });
+      .upsert({ key: data.key, value: data.value as any, updated_at: new Date().toISOString(), updated_by: context.userId });
     if (error) throw new Error(error.message);
     await sb.from("audit_logs").insert({
       tenant_id: null as any,
