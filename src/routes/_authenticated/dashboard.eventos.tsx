@@ -87,7 +87,7 @@ function EventosPage() {
         icon={CalendarDays}
       />
       <FeatureGate
-        flag="events_enabled"
+        flag="eventos"
         title="Eventos disponíveis no plano Pro"
         description={plan.plan?.features.cta_upgrade ?? "Faça upgrade para importar participantes de eventos."}
       >
