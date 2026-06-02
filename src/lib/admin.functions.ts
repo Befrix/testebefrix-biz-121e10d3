@@ -94,13 +94,7 @@ export const listClientes = createServerFn({ method: "GET" })
         sb.from("subscriptions").select("tenant_id, status, plan_id, current_period_end").in("tenant_id", ids),
         sb.from("empresas").select("tenant_id, company_name, company_website").in("tenant_id", ids),
         sb.from("user_roles").select("tenant_id, user_id").in("tenant_id", ids),
-        sb.rpc("noop_dummy").then(async () => {
-          return await sb
-            .from("leads")
-            .select("tenant_id")
-            .in("tenant_id", ids)
-            .then((r) => ({ data: r.data || [] }));
-        }),
+      sb.from("leads").select("tenant_id").in("tenant_id", ids).then((r) => ({ data: r.data || [] })),
         sb.from("planos").select("id, name, tier, monthly_price_cents, features"),
       ]);
 
@@ -151,7 +145,7 @@ export const listUsuarios = createServerFn({ method: "GET" })
       sb.from("tenants").select("id, name"),
     ]);
 
-    const tenantName = new Map((tenants || []).map((t) => [t.id, t.name]));
+    const tenantName = new Map<string, string>((tenants || []).map((t) => [t.id, t.name]));
     const rolesByUser = new Map<string, string[]>();
     for (const r of roles || []) {
       const arr = rolesByUser.get(r.user_id) || [];
@@ -164,7 +158,7 @@ export const listUsuarios = createServerFn({ method: "GET" })
       nome: p.full_name,
       email: p.email,
       cargo: p.job_title,
-      empresa: tenantName.get(p.tenant_id) || "—",
+      empresa: (p.tenant_id ? tenantName.get(p.tenant_id) : "") || "—",
       tenant_id: p.tenant_id,
       roles: rolesByUser.get(p.id) || [],
       criado_em: p.created_at,
@@ -230,7 +224,7 @@ export const updatePlano = createServerFn({ method: "POST" })
     await ensurePlatformAdmin(context.supabase, context.userId);
     const sb = await admin();
     const { id, ...patch } = data;
-    const { error } = await sb.from("planos").update(patch).eq("id", id);
+    const { error } = await sb.from("planos").update(patch as any).eq("id", id);
     if (error) throw new Error(error.message);
     await sb.from("audit_logs").insert({
       tenant_id: null as any,
@@ -354,7 +348,7 @@ export const updatePlatformSetting = createServerFn({ method: "POST" })
       user_id: context.userId,
       action: "platform_settings.update",
       entity: "platform_settings",
-      metadata: { key: data.key },
+      metadata: { key: data.key } as any,
     });
     return { ok: true };
   });
