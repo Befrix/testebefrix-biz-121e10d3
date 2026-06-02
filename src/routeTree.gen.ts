@@ -20,6 +20,7 @@ import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as AdminUsuariosRouteImport } from './routes/admin/usuarios'
 import { Route as AdminPlanosRouteImport } from './routes/admin/planos'
 import { Route as AdminPagamentosRouteImport } from './routes/admin/pagamentos'
+import { Route as AdminEventosRouteImport } from './routes/admin/eventos'
 import { Route as AdminDashboardRouteImport } from './routes/admin/dashboard'
 import { Route as AdminClientesRouteImport } from './routes/admin/clientes'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
@@ -90,6 +91,11 @@ const AdminPlanosRoute = AdminPlanosRouteImport.update({
 const AdminPagamentosRoute = AdminPagamentosRouteImport.update({
   id: '/pagamentos',
   path: '/pagamentos',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminEventosRoute = AdminEventosRouteImport.update({
+  id: '/eventos',
+  path: '/eventos',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminDashboardRoute = AdminDashboardRouteImport.update({
@@ -202,6 +208,7 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/admin/clientes': typeof AdminClientesRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/eventos': typeof AdminEventosRoute
   '/admin/pagamentos': typeof AdminPagamentosRoute
   '/admin/planos': typeof AdminPlanosRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
@@ -229,6 +236,7 @@ export interface FileRoutesByTo {
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/admin/clientes': typeof AdminClientesRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/eventos': typeof AdminEventosRoute
   '/admin/pagamentos': typeof AdminPagamentosRoute
   '/admin/planos': typeof AdminPlanosRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
@@ -260,6 +268,7 @@ export interface FileRoutesById {
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/admin/clientes': typeof AdminClientesRoute
   '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/eventos': typeof AdminEventosRoute
   '/admin/pagamentos': typeof AdminPagamentosRoute
   '/admin/planos': typeof AdminPlanosRoute
   '/admin/usuarios': typeof AdminUsuariosRoute
@@ -291,6 +300,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/admin/clientes'
     | '/admin/dashboard'
+    | '/admin/eventos'
     | '/admin/pagamentos'
     | '/admin/planos'
     | '/admin/usuarios'
@@ -318,6 +328,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/admin/clientes'
     | '/admin/dashboard'
+    | '/admin/eventos'
     | '/admin/pagamentos'
     | '/admin/planos'
     | '/admin/usuarios'
@@ -348,6 +359,7 @@ export interface FileRouteTypes {
     | '/_authenticated/onboarding'
     | '/admin/clientes'
     | '/admin/dashboard'
+    | '/admin/eventos'
     | '/admin/pagamentos'
     | '/admin/planos'
     | '/admin/usuarios'
@@ -454,6 +466,13 @@ declare module '@tanstack/react-router' {
       path: '/pagamentos'
       fullPath: '/admin/pagamentos'
       preLoaderRoute: typeof AdminPagamentosRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/eventos': {
+      id: '/admin/eventos'
+      path: '/eventos'
+      fullPath: '/admin/eventos'
+      preLoaderRoute: typeof AdminEventosRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/dashboard': {
@@ -638,6 +657,7 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 interface AdminRouteChildren {
   AdminClientesRoute: typeof AdminClientesRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
+  AdminEventosRoute: typeof AdminEventosRoute
   AdminPagamentosRoute: typeof AdminPagamentosRoute
   AdminPlanosRoute: typeof AdminPlanosRoute
   AdminUsuariosRoute: typeof AdminUsuariosRoute
@@ -647,6 +667,7 @@ interface AdminRouteChildren {
 const AdminRouteChildren: AdminRouteChildren = {
   AdminClientesRoute: AdminClientesRoute,
   AdminDashboardRoute: AdminDashboardRoute,
+  AdminEventosRoute: AdminEventosRoute,
   AdminPagamentosRoute: AdminPagamentosRoute,
   AdminPlanosRoute: AdminPlanosRoute,
   AdminUsuariosRoute: AdminUsuariosRoute,
