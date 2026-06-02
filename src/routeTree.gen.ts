@@ -23,6 +23,7 @@ import { Route as AdminPagamentosRouteImport } from './routes/admin/pagamentos'
 import { Route as AdminLogsRouteImport } from './routes/admin/logs'
 import { Route as AdminEventosRouteImport } from './routes/admin/eventos'
 import { Route as AdminDashboardRouteImport } from './routes/admin/dashboard'
+import { Route as AdminConfiguracoesRouteImport } from './routes/admin/configuracoes'
 import { Route as AdminClientesRouteImport } from './routes/admin/clientes'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
@@ -107,6 +108,11 @@ const AdminEventosRoute = AdminEventosRouteImport.update({
 const AdminDashboardRoute = AdminDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminConfiguracoesRoute = AdminConfiguracoesRouteImport.update({
+  id: '/configuracoes',
+  path: '/configuracoes',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminClientesRoute = AdminClientesRouteImport.update({
@@ -213,6 +219,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/admin/clientes': typeof AdminClientesRoute
+  '/admin/configuracoes': typeof AdminConfiguracoesRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/eventos': typeof AdminEventosRoute
   '/admin/logs': typeof AdminLogsRoute
@@ -242,6 +249,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/admin/clientes': typeof AdminClientesRoute
+  '/admin/configuracoes': typeof AdminConfiguracoesRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/eventos': typeof AdminEventosRoute
   '/admin/logs': typeof AdminLogsRoute
@@ -275,6 +283,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/admin/clientes': typeof AdminClientesRoute
+  '/admin/configuracoes': typeof AdminConfiguracoesRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/eventos': typeof AdminEventosRoute
   '/admin/logs': typeof AdminLogsRoute
@@ -308,6 +317,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/onboarding'
     | '/admin/clientes'
+    | '/admin/configuracoes'
     | '/admin/dashboard'
     | '/admin/eventos'
     | '/admin/logs'
@@ -337,6 +347,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/onboarding'
     | '/admin/clientes'
+    | '/admin/configuracoes'
     | '/admin/dashboard'
     | '/admin/eventos'
     | '/admin/logs'
@@ -369,6 +380,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/onboarding'
     | '/admin/clientes'
+    | '/admin/configuracoes'
     | '/admin/dashboard'
     | '/admin/eventos'
     | '/admin/logs'
@@ -499,6 +511,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/admin/dashboard'
       preLoaderRoute: typeof AdminDashboardRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/configuracoes': {
+      id: '/admin/configuracoes'
+      path: '/configuracoes'
+      fullPath: '/admin/configuracoes'
+      preLoaderRoute: typeof AdminConfiguracoesRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/clientes': {
@@ -675,6 +694,7 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 
 interface AdminRouteChildren {
   AdminClientesRoute: typeof AdminClientesRoute
+  AdminConfiguracoesRoute: typeof AdminConfiguracoesRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
   AdminEventosRoute: typeof AdminEventosRoute
   AdminLogsRoute: typeof AdminLogsRoute
@@ -686,6 +706,7 @@ interface AdminRouteChildren {
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminClientesRoute: AdminClientesRoute,
+  AdminConfiguracoesRoute: AdminConfiguracoesRoute,
   AdminDashboardRoute: AdminDashboardRoute,
   AdminEventosRoute: AdminEventosRoute,
   AdminLogsRoute: AdminLogsRoute,
