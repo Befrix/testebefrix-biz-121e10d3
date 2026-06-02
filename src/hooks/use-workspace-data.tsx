@@ -13,6 +13,9 @@ export type Lead = {
   status: string;
   score: number;
   created_at: string;
+  phone: string | null;
+  linkedin_url: string | null;
+  metadata: Record<string, unknown> | null;
 };
 
 export type OutreachLog = {
