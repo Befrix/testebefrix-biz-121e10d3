@@ -982,7 +982,7 @@ export type Database = {
         | "meeting_booked"
         | "won"
         | "lost"
-      plan_tier: "starter" | "business" | "enterprise"
+      plan_tier: "starter" | "pro" | "enterprise"
       subscription_status:
         | "trialing"
         | "active"
@@ -1126,7 +1126,7 @@ export const Constants = {
         "won",
         "lost",
       ],
-      plan_tier: ["starter", "business", "enterprise"],
+      plan_tier: ["starter", "pro", "enterprise"],
       subscription_status: [
         "trialing",
         "active",
