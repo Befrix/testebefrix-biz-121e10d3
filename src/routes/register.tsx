@@ -88,7 +88,7 @@ function RegisterPage() {
   return (
     <AuthShell
       title="Crie sua conta"
-      subtitle="Comece grátis. Sem cartão de crédito."
+      subtitle="Comece grátis hoje mesmo."
       footer={
         <>
           Já tem conta?{" "}
