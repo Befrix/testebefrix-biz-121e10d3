@@ -10,6 +10,7 @@ import { GlowOrb } from "@/components/ui/glow-orb";
 import { supabase } from "@/integrations/supabase/client";
 import { formatCurrencyBRL } from "@/lib/dashboard";
 import type { Plan } from "@/hooks/use-plan";
+import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/planos")({
@@ -25,6 +26,7 @@ export const Route = createFileRoute("/planos")({
 const TIER_ORDER = ["starter", "pro", "enterprise"] as const;
 
 function PlanosPage() {
+  const { user } = useAuth();
   const { data, isLoading } = useQuery({
     queryKey: ["public-plans"],
     queryFn: async () => {
@@ -103,7 +105,9 @@ function PlanosPage() {
                       )}
                       variant={highlight ? "default" : "outline"}
                     >
-                      <Link to="/register">{p.tier === "enterprise" ? "Falar com vendas" : "Começar agora"}</Link>
+                      <Link to={user ? "/onboarding" : "/register"}>
+                        {p.tier === "enterprise" ? "Falar com vendas" : "Começar agora"}
+                      </Link>
                     </Button>
 
                     <ul className="mt-8 space-y-3">

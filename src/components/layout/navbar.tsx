@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import { Menu, X, Zap, LayoutDashboard } from "lucide-react";
+import { Menu, X, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useAuth } from "@/hooks/use-auth";
 
 const links = [
   { to: "/", label: "Home" },
@@ -17,7 +16,6 @@ const links = [
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
-  const { user } = useAuth();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -59,20 +57,12 @@ export function Navbar() {
         </nav>
 
         <div className="hidden items-center gap-2 md:flex">
-          {user ? (
-            <Button asChild size="sm" className="bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-glow-primary hover:opacity-90">
-              <Link to="/dashboard"><LayoutDashboard className="h-4 w-4" /> Dashboard</Link>
-            </Button>
-          ) : (
-            <>
-              <Button asChild variant="ghost" size="sm">
-                <Link to="/login">Login</Link>
-              </Button>
-              <Button asChild size="sm" className="bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-glow-primary hover:opacity-90">
-                <Link to="/register">Quero ser cliente</Link>
-              </Button>
-            </>
-          )}
+          <Button asChild variant="ghost" size="sm">
+            <Link to="/login">Login</Link>
+          </Button>
+          <Button asChild size="sm" className="bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-glow-primary hover:opacity-90">
+            <Link to="/register">Quero ser cliente</Link>
+          </Button>
         </div>
 
         <button
