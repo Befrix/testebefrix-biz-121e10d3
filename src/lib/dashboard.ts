@@ -13,6 +13,7 @@ import {
   Plug,
   CreditCard,
   Workflow,
+  Building2,
   type LucideIcon,
 } from "lucide-react";
 
@@ -36,6 +37,7 @@ export const NAV_ITEMS: NavItem[] = [
   { to: "/dashboard/eventos", label: "Eventos", icon: CalendarDays, group: "ops" },
   { to: "/dashboard/uploads", label: "Uploads", icon: Upload, group: "ops" },
   { to: "/dashboard/integracoes", label: "Integrações", icon: Plug, group: "ops" },
+  { to: "/dashboard/empresa", label: "Perfil da empresa", icon: Building2, group: "ops" },
   { to: "/dashboard/pagamentos", label: "Pagamentos", icon: CreditCard, group: "ops" },
 ];
 
