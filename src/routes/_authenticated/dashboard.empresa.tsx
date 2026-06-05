@@ -22,7 +22,7 @@ import { X } from "lucide-react";
 export const Route = createFileRoute("/_authenticated/dashboard/empresa")({
   head: () => ({
     meta: [
-      { title: "Perfil da empresa — BEFRIX" },
+      { title: "Meu Perfil — BEFRIX" },
       { name: "description", content: "Edite os dados da sua empresa, ICP, oferta, estratégia e objetivos." },
     ],
   }),
@@ -132,7 +132,7 @@ function EmpresaPage() {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-2xl font-semibold tracking-tight">Perfil da empresa</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">Meu Perfil</h1>
         <p className="text-sm text-muted-foreground">
           Revise e atualize os dados informados no onboarding. As alterações alimentam imediatamente a IA e as campanhas.
         </p>
@@ -195,7 +195,7 @@ function SectionEmpresa({ initial, profile, userId, onSaved }: { initial: any; p
     setSaving(false);
     if (empRes.error) return toast.error(empRes.error.message);
     if (profRes.error) return toast.error(profRes.error.message);
-    toast.success("Dados da empresa atualizados.");
+    toast.success("✅ Informações atualizadas com sucesso.");
     onSaved();
   };
 
@@ -275,7 +275,7 @@ function SectionOferta({ initial, onSaved }: { initial: any; onSaved: () => void
     }).eq("id", initial.id);
     setSaving(false);
     if (error) return toast.error(error.message);
-    toast.success("Oferta atualizada."); onSaved();
+    toast.success("✅ Informações atualizadas com sucesso."); onSaved();
   };
   return (
     <Card>
@@ -357,7 +357,7 @@ function SectionIcp({ initial, initialStrategy, plan, onSaved }: { initial: any;
     setSaving(false);
     if (icpRes.error) return toast.error(icpRes.error.message);
     if (stratRes.error) return toast.error(stratRes.error.message);
-    toast.success("ICP e nichos atualizados."); onSaved();
+    toast.success("✅ Informações atualizadas com sucesso."); onSaved();
   };
 
   return (
@@ -440,7 +440,7 @@ function SectionPain({ initial, onSaved }: { initial: any; onSaved: () => void }
     }).eq("id", initial.id);
     setSaving(false);
     if (error) return toast.error(error.message);
-    toast.success("Estratégia atualizada."); onSaved();
+    toast.success("✅ Informações atualizadas com sucesso."); onSaved();
   };
   const toneV = watch("tone_of_voice"); const styleV = watch("communication_style");
   return (
@@ -503,7 +503,7 @@ function SectionObjetivos({ initial, onSaved }: { initial: any; onSaved: () => v
     const { error } = await supabase.from("client_strategy_profiles").update({ objetivos: v.objetivos }).eq("id", initial.id);
     setSaving(false);
     if (error) return toast.error(error.message);
-    toast.success("Objetivos atualizados."); onSaved();
+    toast.success("✅ Informações atualizadas com sucesso."); onSaved();
   };
   return (
     <Card>
