@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { listPagamentos } from "@/lib/admin.functions";
+import { listPagamentos, listCancelamentos } from "@/lib/admin.functions";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -12,7 +12,12 @@ const BRL = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" 
 
 function PagamentosPage() {
   const fn = useServerFn(listPagamentos);
+  const cancelFn = useServerFn(listCancelamentos);
   const { data, isLoading } = useQuery({ queryKey: ["admin-pagamentos"], queryFn: () => fn() });
+  const { data: cancelData, isLoading: cancelLoading } = useQuery({
+    queryKey: ["admin-cancelamentos"],
+    queryFn: () => cancelFn(),
+  });
 
   return (
     <div className="space-y-6">
@@ -24,6 +29,7 @@ function PagamentosPage() {
         <TabsList>
           <TabsTrigger value="assinaturas">Assinaturas</TabsTrigger>
           <TabsTrigger value="faturas">Histórico de Faturas</TabsTrigger>
+          <TabsTrigger value="cancelamentos">Cancelamentos</TabsTrigger>
         </TabsList>
         <TabsContent value="assinaturas">
           <Card className="border-border bg-card/50 p-0 overflow-hidden">
@@ -76,6 +82,48 @@ function PagamentosPage() {
                 ))}
                 {data && data.faturas.length === 0 && (
                   <TableRow><TableCell colSpan={5} className="text-center py-6 text-muted-foreground">Nenhuma fatura.</TableCell></TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </Card>
+        </TabsContent>
+        <TabsContent value="cancelamentos">
+          <Card className="border-border bg-card/50 p-0 overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Empresa</TableHead>
+                  <TableHead>Plano</TableHead>
+                  <TableHead>Motivo</TableHead>
+                  <TableHead>Detalhe</TableHead>
+                  <TableHead>Sugestão de melhoria</TableHead>
+                  <TableHead>Data</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {cancelLoading && (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center py-6 text-muted-foreground">
+                      Carregando…
+                    </TableCell>
+                  </TableRow>
+                )}
+                {cancelData?.cancelamentos.map((c: any) => (
+                  <TableRow key={c.id}>
+                    <TableCell className="font-medium">{c.empresa}</TableCell>
+                    <TableCell className="text-muted-foreground">{c.from_plan_name || "—"}</TableCell>
+                    <TableCell><Badge variant="secondary">{c.reason}</Badge></TableCell>
+                    <TableCell className="text-xs text-muted-foreground max-w-xs whitespace-pre-wrap">{c.reason_detail || "—"}</TableCell>
+                    <TableCell className="text-xs text-muted-foreground max-w-xs whitespace-pre-wrap">{c.improvement_suggestion || "—"}</TableCell>
+                    <TableCell className="text-xs text-muted-foreground">{new Date(c.created_at).toLocaleString("pt-BR")}</TableCell>
+                  </TableRow>
+                ))}
+                {cancelData && cancelData.cancelamentos.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center py-6 text-muted-foreground">
+                      Nenhum cancelamento registrado.
+                    </TableCell>
+                  </TableRow>
                 )}
               </TableBody>
             </Table>

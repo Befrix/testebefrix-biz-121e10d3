@@ -21,6 +21,28 @@ import { supabase } from "@/integrations/supabase/client";
 import { formatCurrencyBRL } from "@/lib/dashboard";
 import { usePlan, type Plan } from "@/hooks/use-plan";
 import { cn } from "@/lib/utils";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+
+const CANCEL_REASONS = [
+  "Não estou utilizando a plataforma",
+  "Preço",
+  "Não encontrei os recursos que precisava",
+  "Dificuldade de uso",
+  "Problemas técnicos",
+  "Vou utilizar outra solução",
+  "Empresa encerrou atividades",
+  "Outro",
+] as const;
 
 export const Route = createFileRoute("/_authenticated/dashboard/pagamentos")({
   component: PagamentosPage,
@@ -36,6 +58,10 @@ function PagamentosPage() {
   const current = usePlan();
   const qc = useQueryClient();
   const [confirm, setConfirm] = useState<{ kind: ConfirmKind; targetPlan?: Plan }>({ kind: null });
+  const [cancelOpen, setCancelOpen] = useState(false);
+  const [cancelReason, setCancelReason] = useState<string>("");
+  const [cancelReasonDetail, setCancelReasonDetail] = useState<string>("");
+  const [cancelImprovement, setCancelImprovement] = useState<string>("");
 
   const { data, isLoading } = useQuery({
     queryKey: ["pagamentos", user?.id],
@@ -71,7 +97,11 @@ function PagamentosPage() {
   });
 
   const requestChange = useMutation({
-    mutationFn: async (args: { kind: "upgrade" | "downgrade" | "cancel"; targetPlan?: Plan }) => {
+    mutationFn: async (args: {
+      kind: "upgrade" | "downgrade" | "cancel";
+      targetPlan?: Plan;
+      cancel?: { reason: string; reason_detail?: string; improvement_suggestion?: string };
+    }) => {
       if (!data?.tenantId) throw new Error("Tenant não encontrado");
       const action =
         args.kind === "cancel"
@@ -80,7 +110,7 @@ function PagamentosPage() {
             ? "subscription.upgrade_requested"
             : "subscription.downgrade_requested";
 
-      const metadata = {
+      const metadata: Record<string, unknown> = {
         from_plan_id: current.plan?.id ?? null,
         from_plan_name: current.plan?.name ?? null,
         to_plan_id: args.targetPlan?.id ?? null,
@@ -90,6 +120,12 @@ function PagamentosPage() {
         requested_by: user?.id,
         requested_at: new Date().toISOString(),
       };
+      if (args.kind === "cancel" && args.cancel) {
+        metadata.reason = args.cancel.reason;
+        if (args.cancel.reason_detail) metadata.reason_detail = args.cancel.reason_detail;
+        if (args.cancel.improvement_suggestion)
+          metadata.improvement_suggestion = args.cancel.improvement_suggestion;
+      }
 
       const { error: auditErr } = await supabase.from("audit_logs").insert({
         tenant_id: data.tenantId,
@@ -97,7 +133,7 @@ function PagamentosPage() {
         action,
         entity: "subscription",
         entity_id: data.subscription?.id ?? null,
-        metadata,
+        metadata: metadata as any,
       });
       if (auditErr) throw auditErr;
 
@@ -125,6 +161,12 @@ function PagamentosPage() {
       );
       qc.invalidateQueries({ queryKey: ["pagamentos"] });
       setConfirm({ kind: null });
+      if (vars.kind === "cancel") {
+        setCancelOpen(false);
+        setCancelReason("");
+        setCancelReasonDetail("");
+        setCancelImprovement("");
+      }
     },
     onError: (err: Error) => toast.error(err.message),
   });
@@ -284,7 +326,7 @@ function PagamentosPage() {
           <Button
             variant="destructive"
             disabled={!currentPlan || sub?.status === "canceled"}
-            onClick={() => setConfirm({ kind: "cancel" })}
+            onClick={() => setCancelOpen(true)}
           >
             Solicitar cancelamento
           </Button>
@@ -316,20 +358,19 @@ function PagamentosPage() {
         )}
       </SectionCard>
 
-      <AlertDialog open={confirm.kind !== null} onOpenChange={(o) => !o && setConfirm({ kind: null })}>
+      <AlertDialog
+        open={confirm.kind !== null && confirm.kind !== "cancel"}
+        onOpenChange={(o) => !o && setConfirm({ kind: null })}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {confirm.kind === "cancel"
-                ? "Confirmar solicitação de cancelamento"
-                : confirm.kind === "upgrade"
-                  ? "Confirmar solicitação de upgrade"
-                  : "Confirmar solicitação de downgrade"}
+              {confirm.kind === "upgrade"
+                ? "Confirmar solicitação de upgrade"
+                : "Confirmar solicitação de downgrade"}
             </AlertDialogTitle>
             <AlertDialogDescription>
-              {confirm.kind === "cancel"
-                ? "Sua solicitação será registrada para análise. O acesso permanece ativo até o fim do período vigente."
-                : `Mudar do plano ${currentPlan?.name ?? "—"} para ${confirm.targetPlan?.name ?? "—"} (${formatCurrencyBRL(confirm.targetPlan?.monthly_price_cents ?? 0)}/mês). A solicitação será registrada e processada pela equipe administrativa.`}
+              {`Mudar do plano ${currentPlan?.name ?? "—"} para ${confirm.targetPlan?.name ?? "—"} (${formatCurrencyBRL(confirm.targetPlan?.monthly_price_cents ?? 0)}/mês). A solicitação será registrada e processada pela equipe administrativa.`}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -347,6 +388,112 @@ function PagamentosPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <Dialog
+        open={cancelOpen}
+        onOpenChange={(o) => {
+          if (requestChange.isPending) return;
+          setCancelOpen(o);
+        }}
+      >
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Solicitar cancelamento do plano</DialogTitle>
+            <DialogDescription>
+              Antes de prosseguir, conte-nos o motivo. Sua resposta ajuda a melhorar a BEFRIX. O acesso permanece ativo até o fim do período vigente.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-5 py-2 max-h-[60vh] overflow-y-auto pr-1">
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">
+                Qual o principal motivo do cancelamento? <span className="text-destructive">*</span>
+              </Label>
+              <RadioGroup value={cancelReason} onValueChange={setCancelReason} className="space-y-1.5">
+                {CANCEL_REASONS.map((r) => (
+                  <div key={r} className="flex items-center gap-2">
+                    <RadioGroupItem id={`cancel-${r}`} value={r} />
+                    <Label htmlFor={`cancel-${r}`} className="text-sm font-normal cursor-pointer">
+                      {r}
+                    </Label>
+                  </div>
+                ))}
+              </RadioGroup>
+            </div>
+
+            {cancelReason === "Outro" && (
+              <div className="space-y-2">
+                <Label htmlFor="cancel-detail" className="text-sm font-medium">
+                  Qual o motivo? <span className="text-destructive">*</span>
+                </Label>
+                <Textarea
+                  id="cancel-detail"
+                  value={cancelReasonDetail}
+                  onChange={(e) => setCancelReasonDetail(e.target.value)}
+                  maxLength={1000}
+                  rows={3}
+                  placeholder="Conte com suas palavras…"
+                />
+              </div>
+            )}
+
+            <div className="space-y-2">
+              <Label htmlFor="cancel-improve" className="text-sm font-medium">
+                O que poderíamos melhorar para atender melhor sua empresa?
+              </Label>
+              <Textarea
+                id="cancel-improve"
+                value={cancelImprovement}
+                onChange={(e) => setCancelImprovement(e.target.value)}
+                maxLength={2000}
+                rows={3}
+                placeholder="Opcional"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              disabled={requestChange.isPending}
+              onClick={() => setCancelOpen(false)}
+            >
+              Voltar
+            </Button>
+            <Button
+              variant="destructive"
+              disabled={
+                requestChange.isPending ||
+                !cancelReason ||
+                (cancelReason === "Outro" && cancelReasonDetail.trim().length === 0)
+              }
+              onClick={() => {
+                if (!cancelReason) {
+                  toast.error("Selecione o motivo do cancelamento.");
+                  return;
+                }
+                if (cancelReason === "Outro" && cancelReasonDetail.trim().length === 0) {
+                  toast.error("Descreva o motivo do cancelamento.");
+                  return;
+                }
+                requestChange.mutate({
+                  kind: "cancel",
+                  cancel: {
+                    reason: cancelReason,
+                    reason_detail:
+                      cancelReason === "Outro" ? cancelReasonDetail.trim() : undefined,
+                    improvement_suggestion: cancelImprovement.trim() || undefined,
+                  },
+                });
+              }}
+            >
+              {requestChange.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                "Confirmar cancelamento"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

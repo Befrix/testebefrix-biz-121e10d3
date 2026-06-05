@@ -262,6 +262,35 @@ export const listPagamentos = createServerFn({ method: "GET" })
     };
   });
 
+// ---------- CANCELAMENTOS ----------
+export const listCancelamentos = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await ensurePlatformAdmin(context.supabase, context.userId);
+    const sb = await admin();
+    const [{ data: audit }, { data: tenants }] = await Promise.all([
+      sb
+        .from("audit_logs")
+        .select("*")
+        .eq("action", "subscription.cancel_requested")
+        .order("created_at", { ascending: false })
+        .limit(300),
+      sb.from("tenants").select("id, name"),
+    ]);
+    const tn = new Map((tenants || []).map((t) => [t.id, t.name]));
+    return {
+      cancelamentos: (audit || []).map((a: any) => ({
+        id: a.id,
+        empresa: tn.get(a.tenant_id || "") || "—",
+        created_at: a.created_at,
+        reason: a.metadata?.reason ?? "—",
+        reason_detail: a.metadata?.reason_detail ?? null,
+        improvement_suggestion: a.metadata?.improvement_suggestion ?? null,
+        from_plan_name: a.metadata?.from_plan_name ?? null,
+      })),
+    };
+  });
+
 // ---------- EVENTOS ----------
 export const listEventosPlatform = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
