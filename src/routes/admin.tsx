@@ -1,11 +1,10 @@
 import { useEffect } from "react";
 import { createFileRoute, Outlet, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
 import { Loader2, ShieldAlert } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { AdminSidebar } from "@/components/admin/sidebar";
-import { checkPlatformAdmin } from "@/lib/admin.functions";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/admin")({
@@ -15,7 +14,6 @@ export const Route = createFileRoute("/admin")({
 function AdminLayout() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
-  const check = useServerFn(checkPlatformAdmin);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -26,7 +24,16 @@ function AdminLayout() {
   const { data, isLoading } = useQuery({
     queryKey: ["platform-admin-check", user?.id],
     enabled: !!user,
-    queryFn: () => check(),
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("users" as any)
+        .select("role")
+        .eq("id", user!.id)
+        .maybeSingle();
+      if (error) throw error;
+      const role = (data as any)?.role as string | undefined;
+      return { isPlatformAdmin: role === "admin" || role === "platform_admin" };
+    },
   });
 
   if (loading || !user || isLoading) {
