@@ -37,6 +37,7 @@ import { Route as AuthenticatedDashboardIntegracoesRouteImport } from './routes/
 import { Route as AuthenticatedDashboardInboxRouteImport } from './routes/_authenticated/dashboard.inbox'
 import { Route as AuthenticatedDashboardEventosRouteImport } from './routes/_authenticated/dashboard.eventos'
 import { Route as AuthenticatedDashboardEmpresaRouteImport } from './routes/_authenticated/dashboard.empresa'
+import { Route as AuthenticatedDashboardDocumentosRouteImport } from './routes/_authenticated/dashboard.documentos'
 import { Route as AuthenticatedDashboardCampanhasRouteImport } from './routes/_authenticated/dashboard.campanhas'
 import { Route as AuthenticatedDashboardAutomationsRouteImport } from './routes/_authenticated/dashboard.automations'
 import { Route as AuthenticatedDashboardAutomacoesRouteImport } from './routes/_authenticated/dashboard.automacoes'
@@ -191,6 +192,12 @@ const AuthenticatedDashboardEmpresaRoute =
     path: '/empresa',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const AuthenticatedDashboardDocumentosRoute =
+  AuthenticatedDashboardDocumentosRouteImport.update({
+    id: '/documentos',
+    path: '/documentos',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const AuthenticatedDashboardCampanhasRoute =
   AuthenticatedDashboardCampanhasRouteImport.update({
     id: '/campanhas',
@@ -238,6 +245,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/automacoes': typeof AuthenticatedDashboardAutomacoesRoute
   '/dashboard/automations': typeof AuthenticatedDashboardAutomationsRoute
   '/dashboard/campanhas': typeof AuthenticatedDashboardCampanhasRoute
+  '/dashboard/documentos': typeof AuthenticatedDashboardDocumentosRoute
   '/dashboard/empresa': typeof AuthenticatedDashboardEmpresaRoute
   '/dashboard/eventos': typeof AuthenticatedDashboardEventosRoute
   '/dashboard/inbox': typeof AuthenticatedDashboardInboxRoute
@@ -269,6 +277,7 @@ export interface FileRoutesByTo {
   '/dashboard/automacoes': typeof AuthenticatedDashboardAutomacoesRoute
   '/dashboard/automations': typeof AuthenticatedDashboardAutomationsRoute
   '/dashboard/campanhas': typeof AuthenticatedDashboardCampanhasRoute
+  '/dashboard/documentos': typeof AuthenticatedDashboardDocumentosRoute
   '/dashboard/empresa': typeof AuthenticatedDashboardEmpresaRoute
   '/dashboard/eventos': typeof AuthenticatedDashboardEventosRoute
   '/dashboard/inbox': typeof AuthenticatedDashboardInboxRoute
@@ -304,6 +313,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/automacoes': typeof AuthenticatedDashboardAutomacoesRoute
   '/_authenticated/dashboard/automations': typeof AuthenticatedDashboardAutomationsRoute
   '/_authenticated/dashboard/campanhas': typeof AuthenticatedDashboardCampanhasRoute
+  '/_authenticated/dashboard/documentos': typeof AuthenticatedDashboardDocumentosRoute
   '/_authenticated/dashboard/empresa': typeof AuthenticatedDashboardEmpresaRoute
   '/_authenticated/dashboard/eventos': typeof AuthenticatedDashboardEventosRoute
   '/_authenticated/dashboard/inbox': typeof AuthenticatedDashboardInboxRoute
@@ -339,6 +349,7 @@ export interface FileRouteTypes {
     | '/dashboard/automacoes'
     | '/dashboard/automations'
     | '/dashboard/campanhas'
+    | '/dashboard/documentos'
     | '/dashboard/empresa'
     | '/dashboard/eventos'
     | '/dashboard/inbox'
@@ -370,6 +381,7 @@ export interface FileRouteTypes {
     | '/dashboard/automacoes'
     | '/dashboard/automations'
     | '/dashboard/campanhas'
+    | '/dashboard/documentos'
     | '/dashboard/empresa'
     | '/dashboard/eventos'
     | '/dashboard/inbox'
@@ -404,6 +416,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/automacoes'
     | '/_authenticated/dashboard/automations'
     | '/_authenticated/dashboard/campanhas'
+    | '/_authenticated/dashboard/documentos'
     | '/_authenticated/dashboard/empresa'
     | '/_authenticated/dashboard/eventos'
     | '/_authenticated/dashboard/inbox'
@@ -624,6 +637,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardEmpresaRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/dashboard/documentos': {
+      id: '/_authenticated/dashboard/documentos'
+      path: '/documentos'
+      fullPath: '/dashboard/documentos'
+      preLoaderRoute: typeof AuthenticatedDashboardDocumentosRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/_authenticated/dashboard/campanhas': {
       id: '/_authenticated/dashboard/campanhas'
       path: '/campanhas'
@@ -660,6 +680,7 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardAutomacoesRoute: typeof AuthenticatedDashboardAutomacoesRoute
   AuthenticatedDashboardAutomationsRoute: typeof AuthenticatedDashboardAutomationsRoute
   AuthenticatedDashboardCampanhasRoute: typeof AuthenticatedDashboardCampanhasRoute
+  AuthenticatedDashboardDocumentosRoute: typeof AuthenticatedDashboardDocumentosRoute
   AuthenticatedDashboardEmpresaRoute: typeof AuthenticatedDashboardEmpresaRoute
   AuthenticatedDashboardEventosRoute: typeof AuthenticatedDashboardEventosRoute
   AuthenticatedDashboardInboxRoute: typeof AuthenticatedDashboardInboxRoute
@@ -680,6 +701,8 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
     AuthenticatedDashboardAutomationsRoute:
       AuthenticatedDashboardAutomationsRoute,
     AuthenticatedDashboardCampanhasRoute: AuthenticatedDashboardCampanhasRoute,
+    AuthenticatedDashboardDocumentosRoute:
+      AuthenticatedDashboardDocumentosRoute,
     AuthenticatedDashboardEmpresaRoute: AuthenticatedDashboardEmpresaRoute,
     AuthenticatedDashboardEventosRoute: AuthenticatedDashboardEventosRoute,
     AuthenticatedDashboardInboxRoute: AuthenticatedDashboardInboxRoute,
@@ -753,3 +776,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
