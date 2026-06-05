@@ -106,7 +106,7 @@ function PlanosPage() {
                       variant={highlight ? "default" : "outline"}
                     >
                       <Link to={user ? "/onboarding" : "/register"}>
-                        {p.tier === "enterprise" ? "Falar com vendas" : "Começar agora"}
+                        Começar agora
                       </Link>
                     </Button>
 
