@@ -281,7 +281,7 @@ function OnboardingPage() {
   const saveChannels = async (v: ChannelsForm) => {
     const dailyMax = plan.limit("daily_contacts");
     if (dailyMax !== null) {
-      if (v.daily_limit_email > dailyMax || v.daily_limit_whatsapp > dailyMax) {
+      if (Number(v.daily_limit_email) > dailyMax || Number(v.daily_limit_whatsapp) > dailyMax) {
         return toast.error(`Seu plano atual permite até ${dailyMax} contatos/dia por canal.`);
       }
     }
