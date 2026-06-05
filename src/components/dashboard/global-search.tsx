@@ -202,7 +202,7 @@ export function GlobalSearch() {
           ) : isFetching ? (
             <CommandEmpty>Buscando…</CommandEmpty>
           ) : groups.length === 0 ? (
-            <CommandEmpty>Nenhum resultado encontrado para “{term}”.</CommandEmpty>
+            <CommandEmpty>Não encontramos resultados para sua pesquisa.</CommandEmpty>
           ) : (
             groups.map((g, i) => (
               <div key={g.key}>
