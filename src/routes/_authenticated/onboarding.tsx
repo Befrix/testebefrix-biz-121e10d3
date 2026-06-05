@@ -289,6 +289,9 @@ function OnboardingPage() {
         return toast.error(`Seu plano atual permite até ${dailyMax} contatos/dia por canal.`);
       }
     }
+    if (!v.accept_termo_uso || !v.accept_politica_privacidade) {
+      return toast.error("Você precisa aceitar o Termo de Uso e a Política de Privacidade para concluir.");
+    }
     setSaving(true);
     const [stratRes, empRes] = await Promise.all([
       supabase.from("client_strategy_profiles").update({
@@ -309,6 +312,14 @@ function OnboardingPage() {
     setSaving(false);
     if (stratRes.error) return toast.error(stratRes.error.message);
     if (empRes.error) return toast.error(empRes.error.message);
+    const tenantId = (state.empresa as any)?.tenant_id || (state.profile as any)?.tenant_id;
+    if (tenantId) {
+      await Promise.all(
+        ONBOARDING_REQUIRED_DOCS.map((doc) =>
+          recordLegalConsent({ supabase, tenantId, userId: user!.id, doc, source: "onboarding" }),
+        ),
+      );
+    }
     toast.success("Onboarding concluído. Escolha seu plano para ativar.");
     navigate({ to: "/planos" });
   };
