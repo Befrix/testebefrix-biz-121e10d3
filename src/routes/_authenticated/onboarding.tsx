@@ -22,6 +22,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { usePlan } from "@/hooks/use-plan";
 import { maskCNPJ, isValidCNPJ, onlyDigits } from "@/lib/cnpj";
+import { ONBOARDING_REQUIRED_DOCS, recordLegalConsent } from "@/lib/legal-docs";
+import { DocViewer } from "@/components/legal/doc-viewer";
 
 export const Route = createFileRoute("/_authenticated/onboarding")({
   head: () => ({
@@ -119,6 +121,8 @@ const channelsSchema = z.object({
   window_end: z.string().regex(/^\d{2}:\d{2}$/).default("18:00"),
   email_signature: z.string().trim().max(500).optional().or(z.literal("")),
   calendar_url: z.string().trim().url("URL inválida").max(255).or(z.literal("")),
+  accept_termo_uso: z.literal(true, { message: "Aceite o Termo de Uso para continuar." }),
+  accept_politica_privacidade: z.literal(true, { message: "Aceite a Política de Privacidade para continuar." }),
 });
 type ChannelsForm = z.input<typeof channelsSchema>;
 
