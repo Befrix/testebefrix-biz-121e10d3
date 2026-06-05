@@ -147,7 +147,7 @@ function InteligenciaPage() {
     <div className="space-y-8">
       <PageHeader
         title="AI Copilot"
-        description="Análise estratégica em tempo real de campanhas, canais, segmentos, padrões temporais e SDRs."
+        description="A inteligência da BEFRIX analisa seus dados e mostra o que está funcionando, onde estão as oportunidades e onde corrigir a rota — em linguagem simples e acionável."
         icon={BrainCircuit}
         action={
           <div className="flex items-center gap-3">

@@ -26,7 +26,7 @@ function UploadsPage() {
 
   return (
     <div className="space-y-8">
-      <PageHeader title="Uploads" description="Importe listas de leads via CSV/planilha." icon={Upload}
+      <PageHeader title="Importação de Eventos" description="Envie listas de participantes de eventos em CSV/planilha. Cada linha vira um lead enriquecido automaticamente." icon={Upload}
         action={<Button className="bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-glow-primary"><Upload className="h-4 w-4" /> Novo upload</Button>} />
       {isLoading ? (
         <div className="grid place-items-center py-32"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>

@@ -35,7 +35,7 @@ export const NAV_ITEMS: NavItem[] = [
   { to: "/dashboard/analytics", label: "Analytics", icon: BarChart3, group: "intelligence" },
   { to: "/dashboard/inteligencia", label: "Inteligência", icon: BrainCircuit, group: "intelligence" },
   { to: "/dashboard/eventos", label: "Eventos", icon: CalendarDays, group: "ops" },
-  { to: "/dashboard/uploads", label: "Uploads", icon: Upload, group: "ops" },
+  { to: "/dashboard/uploads", label: "Importação de Eventos", icon: Upload, group: "ops" },
   { to: "/dashboard/integracoes", label: "Integrações", icon: Plug, group: "ops" },
   { to: "/dashboard/empresa", label: "Perfil da empresa", icon: Building2, group: "ops" },
   { to: "/dashboard/pagamentos", label: "Pagamentos", icon: CreditCard, group: "ops" },
