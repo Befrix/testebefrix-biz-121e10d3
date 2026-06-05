@@ -1,10 +1,12 @@
 import { useEffect } from "react";
 import { createFileRoute, Outlet, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { Loader2, ShieldAlert } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { AdminSidebar } from "@/components/admin/sidebar";
-import { supabase } from "@/integrations/supabase/client";
+import { AdminTopbar } from "@/components/admin/topbar";
+import { checkPlatformAdmin } from "@/lib/admin.functions";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/admin")({
@@ -21,19 +23,11 @@ function AdminLayout() {
     }
   }, [loading, user, navigate]);
 
+  const check = useServerFn(checkPlatformAdmin);
   const { data, isLoading } = useQuery({
     queryKey: ["platform-admin-check", user?.id],
     enabled: !!user,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("users" as any)
-        .select("role")
-        .eq("id", user!.id)
-        .maybeSingle();
-      if (error) throw error;
-      const role = (data as any)?.role as string | undefined;
-      return { isPlatformAdmin: role === "admin" || role === "platform_admin" };
-    },
+    queryFn: () => check(),
   });
 
   if (loading || !user || isLoading) {
@@ -63,6 +57,7 @@ function AdminLayout() {
     <div className="min-h-screen bg-background text-foreground">
       <AdminSidebar />
       <main className="lg:pl-64">
+        <AdminTopbar />
         <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
           <Outlet />
         </div>

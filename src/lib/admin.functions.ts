@@ -465,3 +465,95 @@ export const listSatisfactionSurveys = createServerFn({ method: "GET" })
       }),
     };
   });
+
+// ---------- ADMIN NOTIFICATIONS (enriched audit_logs) ----------
+export const listAdminNotifications = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await ensurePlatformAdmin(context.supabase, context.userId);
+    const sb = await admin();
+    const { data: logs, error } = await sb
+      .from("audit_logs")
+      .select("id, action, entity, entity_id, tenant_id, user_id, created_at, metadata")
+      .order("created_at", { ascending: false })
+      .limit(50);
+    if (error) throw new Error(error.message);
+
+    const tenantIds = Array.from(new Set((logs || []).map((l) => l.tenant_id).filter(Boolean))) as string[];
+    const userIds = Array.from(new Set((logs || []).map((l) => l.user_id).filter(Boolean))) as string[];
+    const [{ data: tenants }, { data: empresas }, { data: profiles }] = await Promise.all([
+      tenantIds.length ? sb.from("tenants").select("id, name").in("id", tenantIds) : Promise.resolve({ data: [] as any[] }),
+      tenantIds.length ? sb.from("empresas").select("tenant_id, company_name").in("tenant_id", tenantIds) : Promise.resolve({ data: [] as any[] }),
+      userIds.length ? sb.from("profiles").select("id, full_name, email").in("id", userIds) : Promise.resolve({ data: [] as any[] }),
+    ]);
+    const tn = new Map((tenants || []).map((t: any) => [t.id, t.name]));
+    const en = new Map((empresas || []).map((e: any) => [e.tenant_id, e.company_name]));
+    const pn = new Map((profiles || []).map((p: any) => [p.id, p]));
+
+    return {
+      notifications: (logs || []).map((l: any) => {
+        const meta = l.metadata || {};
+        const prof = pn.get(l.user_id || "") as any;
+        return {
+          id: l.id,
+          action: l.action,
+          entity: l.entity,
+          entity_id: l.entity_id,
+          tenant_id: l.tenant_id,
+          empresa: en.get(l.tenant_id || "") || tn.get(l.tenant_id || "") || "—",
+          cliente: prof?.full_name || prof?.email || "Sistema",
+          cliente_email: prof?.email || null,
+          created_at: l.created_at,
+          status: meta.status ?? meta.deal_status ?? meta.subscription_status ?? null,
+          tipo: meta.tipo ?? meta.reason ?? null,
+          metadata: meta,
+        };
+      }),
+    };
+  });
+
+// ---------- ADMIN GLOBAL SEARCH ----------
+const SearchInput = z.object({ q: z.string().min(1).max(120) });
+export const adminSearch = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i) => SearchInput.parse(i))
+  .handler(async ({ context, data }) => {
+    await ensurePlatformAdmin(context.supabase, context.userId);
+    const sb = await admin();
+    const q = data.q.trim();
+    const like = `%${q}%`;
+
+    const [tenants, empresas, profiles, leads, eventos, invoices, subs, logs] = await Promise.all([
+      sb.from("tenants").select("id, name, slug, plan").or(`name.ilike.${like},slug.ilike.${like}`).limit(8),
+      sb.from("empresas").select("tenant_id, company_name, company_website").or(`company_name.ilike.${like},company_website.ilike.${like}`).limit(8),
+      sb.from("profiles").select("id, full_name, email, tenant_id").or(`full_name.ilike.${like},email.ilike.${like}`).limit(8),
+      sb.from("leads").select("id, name, email, company, tenant_id").or(`name.ilike.${like},email.ilike.${like},company.ilike.${like}`).limit(8),
+      sb.from("eventos_uploads").select("id, file_name, tenant_id, created_at").ilike("file_name", like).limit(8),
+      sb.from("invoices").select("id, tenant_id, status, amount_cents, created_at").ilike("status", like).limit(5),
+      sb.from("subscriptions").select("id, tenant_id, status").ilike("status", like).limit(5),
+      sb.from("audit_logs").select("id, action, entity, tenant_id, created_at").or(`action.ilike.${like},entity.ilike.${like}`).limit(8),
+    ]);
+
+    const tenantIds = new Set<string>();
+    [empresas, profiles, leads, eventos, invoices, subs, logs].forEach((r) => {
+      (r.data || []).forEach((row: any) => row.tenant_id && tenantIds.add(row.tenant_id));
+    });
+    (tenants.data || []).forEach((t: any) => tenantIds.add(t.id));
+    const { data: tenantsAll } = tenantIds.size
+      ? await sb.from("tenants").select("id, name").in("id", Array.from(tenantIds))
+      : { data: [] as any[] };
+    const tn = new Map((tenantsAll || []).map((t: any) => [t.id, t.name]));
+
+    return {
+      results: {
+        clientes: (tenants.data || []).map((t: any) => ({ id: t.id, label: t.name, sub: t.plan, href: "/admin/clientes" })),
+        empresas: (empresas.data || []).map((e: any) => ({ id: e.tenant_id, label: e.company_name, sub: e.company_website || tn.get(e.tenant_id), href: "/admin/clientes" })),
+        usuarios: (profiles.data || []).map((p: any) => ({ id: p.id, label: p.full_name || p.email, sub: `${p.email} · ${tn.get(p.tenant_id || "") || "—"}`, href: "/admin/usuarios" })),
+        leads: (leads.data || []).map((l: any) => ({ id: l.id, label: l.name || l.email, sub: `${l.company || ""} · ${tn.get(l.tenant_id || "") || "—"}`, href: "/admin/clientes" })),
+        eventos: (eventos.data || []).map((e: any) => ({ id: e.id, label: e.file_name, sub: tn.get(e.tenant_id || "") || "—", href: "/admin/eventos" })),
+        pagamentos: (invoices.data || []).map((i: any) => ({ id: i.id, label: `Fatura ${i.status}`, sub: `${tn.get(i.tenant_id || "") || "—"} · R$ ${(i.amount_cents / 100).toFixed(2)}`, href: "/admin/pagamentos" })),
+        assinaturas: (subs.data || []).map((s: any) => ({ id: s.id, label: `Assinatura ${s.status}`, sub: tn.get(s.tenant_id || "") || "—", href: "/admin/pagamentos" })),
+        logs: (logs.data || []).map((l: any) => ({ id: l.id, label: l.action, sub: `${l.entity} · ${tn.get(l.tenant_id || "") || "—"}`, href: "/admin/logs" })),
+      },
+    };
+  });
