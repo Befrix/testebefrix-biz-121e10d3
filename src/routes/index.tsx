@@ -305,16 +305,18 @@ function Index() {
             <GlowOrb className="-top-40 left-1/2 -translate-x-1/2" variant="primary" size="lg" />
             <GlowOrb className="-bottom-40 right-0" variant="accent" size="md" />
             <div className="relative">
-              <Badge variant="outline" className="glass mb-6 gap-1.5 border-border-glow px-3 py-1 text-xs">
-                <Sparkles className="h-3 w-3 text-accent" /> Comece hoje mesmo
-              </Badge>
               <h2 className="mx-auto max-w-3xl text-balance text-4xl font-semibold tracking-tight md:text-6xl">
-                Pronto para escalar seu{" "}
-                <span className="text-gradient-primary">outbound com IA?</span>
+                Pronto para gerar mais oportunidades com menos esforço?
               </h2>
               <p className="mx-auto mt-5 max-w-xl text-muted-foreground md:text-lg">
-                Junte-se aos times que multiplicaram pipeline em 3x com a BEFRIX.
+                Centralize prospecção, automação, inteligência comercial e acompanhamento de resultados em uma única plataforma.
               </p>
+              <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-sm text-muted-foreground">
+                <span className="inline-flex items-center gap-1.5">⚡ Implantação guiada</span>
+                <span className="inline-flex items-center gap-1.5">🤖 Automação com IA</span>
+                <span className="inline-flex items-center gap-1.5">📈 Escalabilidade para sua operação</span>
+                <span className="inline-flex items-center gap-1.5">🔒 Dados centralizados e seguros</span>
+              </div>
               <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
                 <Button asChild size="lg" className="bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-glow-primary hover:opacity-90">
                   <Link to="/register">Quero ser cliente <ArrowRight className="ml-1 h-4 w-4" /></Link>
@@ -322,13 +324,6 @@ function Index() {
                 <Button asChild size="lg" variant="outline" className="glass border-border">
                   <Link to="/planos">Ver planos</Link>
                 </Button>
-              </div>
-              <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-xs text-muted-foreground">
-                {["Comece grátis", "Setup em 2 minutos", "Cancele quando quiser"].map((t) => (
-                  <span key={t} className="inline-flex items-center gap-1.5">
-                    <CheckCircle2 className="h-3.5 w-3.5 text-success" /> {t}
-                  </span>
-                ))}
               </div>
             </div>
           </div>
