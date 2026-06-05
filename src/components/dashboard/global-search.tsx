@@ -85,7 +85,7 @@ export function GlobalSearch() {
       {
         key: "sequencias",
         title: "Sequências",
-        items: data.sequencias.map((s) => ({ id: s.id, label: s.name, to: "/dashboard/sequencias" })),
+        items: data.sequencias.map((s) => ({ id: s.id, label: s.name, sub: undefined as string | undefined, to: "/dashboard/sequencias" })),
       },
       {
         key: "automacoes",
