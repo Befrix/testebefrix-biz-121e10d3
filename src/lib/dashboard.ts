@@ -15,6 +15,7 @@ import {
   Workflow,
   Building2,
   FileText,
+  Radar,
   type LucideIcon,
 } from "lucide-react";
 
@@ -35,6 +36,7 @@ export const NAV_ITEMS: NavItem[] = [
   { to: "/dashboard/inbox", label: "Inbox", icon: Inbox, group: "intelligence" },
   { to: "/dashboard/analytics", label: "Analytics", icon: BarChart3, group: "intelligence" },
   { to: "/dashboard/inteligencia", label: "Inteligência", icon: BrainCircuit, group: "intelligence" },
+  { to: "/dashboard/radar", label: "Radar BEFRIX", icon: Radar, group: "intelligence" },
   { to: "/dashboard/eventos", label: "Eventos", icon: CalendarDays, group: "ops" },
   { to: "/dashboard/uploads", label: "Importação de Eventos", icon: Upload, group: "ops" },
   { to: "/dashboard/integracoes", label: "Integrações", icon: Plug, group: "ops" },
