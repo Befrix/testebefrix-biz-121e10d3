@@ -49,7 +49,7 @@ export function GlobalSearch() {
           .limit(8),
         supabase.from("campanhas").select("id, name, channel").ilike("name", like).limit(6),
         supabase.from("sequencias").select("id, name").ilike("name", like).limit(6),
-        supabase.from("automacoes").select("id, name, status").ilike("name", like).limit(6),
+        supabase.from("automacoes").select("id, name").ilike("name", like).limit(6),
         supabase.from("eventos_uploads").select("id, filename").ilike("filename", like).limit(6),
         supabase.from("invoices").select("id, amount_cents, status").limit(0),
       ]);
@@ -57,7 +57,7 @@ export function GlobalSearch() {
         leads: (leads.data ?? []) as Array<{ id: string; full_name: string | null; email: string | null; company: string | null }>,
         campanhas: (camp.data ?? []) as Array<{ id: string; name: string; channel: string | null }>,
         sequencias: (seq.data ?? []) as Array<{ id: string; name: string }>,
-        automacoes: (autom.data ?? []) as Array<{ id: string; name: string; status: string | null }>,
+        automacoes: (autom.data ?? []) as Array<{ id: string; name: string }>,
         eventos: (evt.data ?? []) as Array<{ id: string; filename: string }>,
         invoices: inv.data ?? [],
       };
@@ -90,12 +90,12 @@ export function GlobalSearch() {
       {
         key: "automacoes",
         title: "Automações",
-        items: data.automacoes.map((a) => ({ id: a.id, label: a.name, sub: a.status ?? undefined, to: "/dashboard/automacoes" })),
+        items: data.automacoes.map((a) => ({ id: a.id, label: a.name, sub: undefined as string | undefined, to: "/dashboard/automacoes" })),
       },
       {
         key: "eventos",
         title: "Eventos",
-        items: data.eventos.map((e) => ({ id: e.id, label: e.filename, to: "/dashboard/uploads" })),
+        items: data.eventos.map((e) => ({ id: e.id, label: e.filename, sub: undefined as string | undefined, to: "/dashboard/uploads" })),
       },
     ].filter((g) => g.items.length > 0);
   }, [data]);
