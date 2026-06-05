@@ -428,3 +428,40 @@ export const listLegalConsents = createServerFn({ method: "GET" })
       .filter(Boolean);
     return { consents };
   });
+
+// ---------- SATISFACTION SURVEYS ----------
+export const listSatisfactionSurveys = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await ensurePlatformAdmin(context.supabase, context.userId);
+    const sb = await admin();
+    const [{ data: rows, error }, { data: tenants }, { data: profiles }] = await Promise.all([
+      sb
+        .from("audit_logs")
+        .select("id, tenant_id, user_id, created_at, metadata")
+        .eq("action", "satisfaction_survey")
+        .order("created_at", { ascending: false })
+        .limit(500),
+      sb.from("tenants").select("id, name"),
+      sb.from("profiles").select("id, full_name, email"),
+    ]);
+    if (error) throw new Error(error.message);
+    const tn = new Map((tenants || []).map((t: any) => [t.id, t.name]));
+    const pn = new Map((profiles || []).map((p: any) => [p.id, p]));
+    return {
+      surveys: (rows || []).map((r: any) => {
+        const meta = r.metadata || {};
+        const prof = pn.get(r.user_id || "") as any;
+        return {
+          id: r.id,
+          empresa: tn.get(r.tenant_id || "") || "—",
+          user_name: prof?.full_name || "—",
+          user_email: prof?.email || "—",
+          satisfaction_score: meta.satisfaction_score ?? null,
+          favorite_feature: meta.favorite_feature ?? null,
+          suggested_improvement: meta.suggested_improvement ?? null,
+          created_at: r.created_at,
+        };
+      }),
+    };
+  });
