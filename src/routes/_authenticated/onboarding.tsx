@@ -831,9 +831,13 @@ function StepChannels({
       window_end: sw.end ?? "18:00",
       email_signature: initialStrategy?.email_signature ?? "",
       calendar_url: initialEmpresa?.calendar_url ?? "",
+      accept_termo_uso: false as unknown as true,
+      accept_politica_privacidade: false as unknown as true,
     },
   });
   const channels = watch("channels_enabled") ?? [];
+  const acceptTermo = watch("accept_termo_uso" as any) as unknown as boolean;
+  const acceptPriv = watch("accept_politica_privacidade" as any) as unknown as boolean;
   const toggle = (c: "email" | "whatsapp", v: boolean) => {
     const set = new Set(channels);
     if (v) set.add(c); else set.delete(c);
@@ -902,6 +906,48 @@ function StepChannels({
         >
           <Input {...register("calendar_url")} placeholder="https://cal.com/seu-handle/intro" />
         </Field>
+
+        <div className="rounded-xl border border-border bg-secondary/20 p-4">
+          <p className="mb-3 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            Documentos da plataforma
+          </p>
+          <div className="space-y-3">
+            {ONBOARDING_REQUIRED_DOCS.map((doc) => {
+              const fieldName =
+                doc.id === "termo_uso" ? "accept_termo_uso" : "accept_politica_privacidade";
+              const checked = fieldName === "accept_termo_uso" ? acceptTermo : acceptPriv;
+              const err =
+                fieldName === "accept_termo_uso"
+                  ? (errors as any).accept_termo_uso?.message
+                  : (errors as any).accept_politica_privacidade?.message;
+              return (
+                <div key={doc.id} className="flex items-start gap-3">
+                  <Checkbox
+                    id={fieldName}
+                    checked={!!checked}
+                    onCheckedChange={(v) =>
+                      setValue(fieldName as any, (!!v) as any, { shouldValidate: true })
+                    }
+                    className="mt-0.5"
+                  />
+                  <div className="flex-1 text-sm">
+                    <Label htmlFor={fieldName} className="cursor-pointer leading-snug">
+                      {doc.acceptanceLabel}{" "}
+                      <span className="text-xs text-muted-foreground">(v. {doc.version})</span>
+                    </Label>
+                    <div className="mt-1">
+                      <DocViewer doc={doc} />
+                    </div>
+                    {err && <p className="mt-1 text-[11px] text-destructive">{String(err)}</p>}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <p className="mt-3 text-[11px] text-muted-foreground">
+            O Contrato de Prestação de Serviços SaaS será apresentado para aceite após a confirmação do pagamento do plano contratado.
+          </p>
+        </div>
       </div>
       <Footer onBack={onBack} saving={saving} last />
     </form>
