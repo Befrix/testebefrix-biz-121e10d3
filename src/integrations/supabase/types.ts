@@ -151,6 +151,7 @@ export type Database = {
           keywords: string[]
           main_pain: string | null
           objections: string[]
+          objetivos: string[]
           offer: string | null
           onboarding_completed: boolean
           problems_solved: string[]
@@ -159,6 +160,7 @@ export type Database = {
           target_audience: string | null
           target_roles: string[]
           tenant_id: string
+          ticket_medio: string | null
           tone_of_voice: string | null
           updated_at: string
         }
@@ -178,6 +180,7 @@ export type Database = {
           keywords?: string[]
           main_pain?: string | null
           objections?: string[]
+          objetivos?: string[]
           offer?: string | null
           onboarding_completed?: boolean
           problems_solved?: string[]
@@ -186,6 +189,7 @@ export type Database = {
           target_audience?: string | null
           target_roles?: string[]
           tenant_id: string
+          ticket_medio?: string | null
           tone_of_voice?: string | null
           updated_at?: string
         }
@@ -205,6 +209,7 @@ export type Database = {
           keywords?: string[]
           main_pain?: string | null
           objections?: string[]
+          objetivos?: string[]
           offer?: string | null
           onboarding_completed?: boolean
           problems_solved?: string[]
@@ -213,6 +218,7 @@ export type Database = {
           target_audience?: string | null
           target_roles?: string[]
           tenant_id?: string
+          ticket_medio?: string | null
           tone_of_voice?: string | null
           updated_at?: string
         }
@@ -229,6 +235,7 @@ export type Database = {
       empresas: {
         Row: {
           calendar_url: string | null
+          cnpj: string | null
           company_instagram: string | null
           company_linkedin: string | null
           company_name: string
@@ -237,14 +244,18 @@ export type Database = {
           company_subsegment: string | null
           company_website: string | null
           created_at: string
+          faturamento_anual: string | null
           id: string
+          nome_fantasia: string | null
           onboarding_completed: boolean
+          razao_social: string | null
           target_region: string | null
           tenant_id: string
           updated_at: string
         }
         Insert: {
           calendar_url?: string | null
+          cnpj?: string | null
           company_instagram?: string | null
           company_linkedin?: string | null
           company_name: string
@@ -253,14 +264,18 @@ export type Database = {
           company_subsegment?: string | null
           company_website?: string | null
           created_at?: string
+          faturamento_anual?: string | null
           id?: string
+          nome_fantasia?: string | null
           onboarding_completed?: boolean
+          razao_social?: string | null
           target_region?: string | null
           tenant_id: string
           updated_at?: string
         }
         Update: {
           calendar_url?: string | null
+          cnpj?: string | null
           company_instagram?: string | null
           company_linkedin?: string | null
           company_name?: string
@@ -269,8 +284,11 @@ export type Database = {
           company_subsegment?: string | null
           company_website?: string | null
           created_at?: string
+          faturamento_anual?: string | null
           id?: string
+          nome_fantasia?: string | null
           onboarding_completed?: boolean
+          razao_social?: string | null
           target_region?: string | null
           tenant_id?: string
           updated_at?: string
