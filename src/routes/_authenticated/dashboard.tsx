@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { DashboardSidebar } from "@/components/dashboard/sidebar";
 import { DashboardTopbar } from "@/components/dashboard/topbar";
+import { SatisfactionSurveyModal } from "@/components/dashboard/satisfaction-survey";
 import { GlowOrb } from "@/components/ui/glow-orb";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
@@ -50,6 +51,7 @@ function DashboardLayout() {
           <Outlet />
         </main>
       </div>
+      <SatisfactionSurveyModal />
     </div>
   );
 }
