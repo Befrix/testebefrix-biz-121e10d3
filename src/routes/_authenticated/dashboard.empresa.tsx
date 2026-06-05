@@ -162,7 +162,7 @@ type EmpresaForm = z.input<typeof empresaSchema>;
 
 function SectionEmpresa({ initial, profile, userId, onSaved }: { initial: any; profile: any; userId: string; onSaved: () => void }) {
   const [saving, setSaving] = useState(false);
-  const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<EmpresaForm>({
+  const form = useForm<EmpresaForm>({
     resolver: zodResolver(empresaSchema),
     defaultValues: {
       razao_social: initial?.razao_social ?? "",
@@ -175,6 +175,20 @@ function SectionEmpresa({ initial, profile, userId, onSaved }: { initial: any; p
       phone: profile?.phone ?? "",
     },
   });
+  const { register, handleSubmit, setValue, watch, formState: { errors } } = form;
+  useEffect(() => {
+    form.reset({
+      razao_social: initial?.razao_social ?? "",
+      nome_fantasia: initial?.nome_fantasia ?? initial?.company_name ?? "",
+      cnpj: initial?.cnpj ? maskCNPJ(initial.cnpj) : "",
+      company_website: initial?.company_website ?? "",
+      company_segment: initial?.company_segment ?? "",
+      company_size: (initial?.company_size as EmpresaForm["company_size"]) ?? "11-50",
+      faturamento_anual: (initial?.faturamento_anual as EmpresaForm["faturamento_anual"]) ?? "Até R$ 500 mil",
+      phone: profile?.phone ?? "",
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initial, profile]);
   const cnpjV = watch("cnpj"); const sizeV = watch("company_size"); const fatV = watch("faturamento_anual");
 
   const onSubmit = async (v: EmpresaForm) => {
