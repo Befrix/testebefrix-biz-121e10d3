@@ -21,6 +21,28 @@ import { supabase } from "@/integrations/supabase/client";
 import { formatCurrencyBRL } from "@/lib/dashboard";
 import { usePlan, type Plan } from "@/hooks/use-plan";
 import { cn } from "@/lib/utils";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+
+const CANCEL_REASONS = [
+  "Não estou utilizando a plataforma",
+  "Preço",
+  "Não encontrei os recursos que precisava",
+  "Dificuldade de uso",
+  "Problemas técnicos",
+  "Vou utilizar outra solução",
+  "Empresa encerrou atividades",
+  "Outro",
+] as const;
 
 export const Route = createFileRoute("/_authenticated/dashboard/pagamentos")({
   component: PagamentosPage,
@@ -36,6 +58,10 @@ function PagamentosPage() {
   const current = usePlan();
   const qc = useQueryClient();
   const [confirm, setConfirm] = useState<{ kind: ConfirmKind; targetPlan?: Plan }>({ kind: null });
+  const [cancelOpen, setCancelOpen] = useState(false);
+  const [cancelReason, setCancelReason] = useState<string>("");
+  const [cancelReasonDetail, setCancelReasonDetail] = useState<string>("");
+  const [cancelImprovement, setCancelImprovement] = useState<string>("");
 
   const { data, isLoading } = useQuery({
     queryKey: ["pagamentos", user?.id],
@@ -71,7 +97,11 @@ function PagamentosPage() {
   });
 
   const requestChange = useMutation({
-    mutationFn: async (args: { kind: "upgrade" | "downgrade" | "cancel"; targetPlan?: Plan }) => {
+    mutationFn: async (args: {
+      kind: "upgrade" | "downgrade" | "cancel";
+      targetPlan?: Plan;
+      cancel?: { reason: string; reason_detail?: string; improvement_suggestion?: string };
+    }) => {
       if (!data?.tenantId) throw new Error("Tenant não encontrado");
       const action =
         args.kind === "cancel"
@@ -80,7 +110,7 @@ function PagamentosPage() {
             ? "subscription.upgrade_requested"
             : "subscription.downgrade_requested";
 
-      const metadata = {
+      const metadata: Record<string, unknown> = {
         from_plan_id: current.plan?.id ?? null,
         from_plan_name: current.plan?.name ?? null,
         to_plan_id: args.targetPlan?.id ?? null,
@@ -90,6 +120,12 @@ function PagamentosPage() {
         requested_by: user?.id,
         requested_at: new Date().toISOString(),
       };
+      if (args.kind === "cancel" && args.cancel) {
+        metadata.reason = args.cancel.reason;
+        if (args.cancel.reason_detail) metadata.reason_detail = args.cancel.reason_detail;
+        if (args.cancel.improvement_suggestion)
+          metadata.improvement_suggestion = args.cancel.improvement_suggestion;
+      }
 
       const { error: auditErr } = await supabase.from("audit_logs").insert({
         tenant_id: data.tenantId,
@@ -125,6 +161,12 @@ function PagamentosPage() {
       );
       qc.invalidateQueries({ queryKey: ["pagamentos"] });
       setConfirm({ kind: null });
+      if (vars.kind === "cancel") {
+        setCancelOpen(false);
+        setCancelReason("");
+        setCancelReasonDetail("");
+        setCancelImprovement("");
+      }
     },
     onError: (err: Error) => toast.error(err.message),
   });
