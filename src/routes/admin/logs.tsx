@@ -2,7 +2,7 @@ import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { listLogs } from "@/lib/admin.functions";
+import { listLogs, listSatisfactionSurveys } from "@/lib/admin.functions";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -17,6 +17,7 @@ const CATEGORIES = [
   { key: "n8n", label: "Execuções N8N" },
   { key: "plano", label: "Mudanças de Plano" },
   { key: "admin", label: "Alterações Admin" },
+  { key: "satisfacao", label: "Pesquisa de Satisfação" },
 ];
 
 function LogsPage() {
@@ -24,7 +25,14 @@ function LogsPage() {
   const fn = useServerFn(listLogs);
   const { data, isLoading } = useQuery({
     queryKey: ["admin-logs", cat],
+    enabled: cat !== "satisfacao",
     queryFn: () => fn({ data: { category: cat || undefined } }),
+  });
+  const surveysFn = useServerFn(listSatisfactionSurveys);
+  const { data: surveysData, isLoading: surveysLoading } = useQuery({
+    queryKey: ["admin-satisfaction"],
+    enabled: cat === "satisfacao",
+    queryFn: () => surveysFn(),
   });
 
   return (
@@ -42,6 +50,41 @@ function LogsPage() {
         </TabsList>
       </Tabs>
 
+      {cat === "satisfacao" ? (
+        <Card className="border-border bg-card/50 p-0 overflow-hidden">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Empresa</TableHead>
+                <TableHead>Usuário</TableHead>
+                <TableHead>Nota</TableHead>
+                <TableHead>O que mais gosta</TableHead>
+                <TableHead>Sugestão de melhoria</TableHead>
+                <TableHead>Data</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {surveysLoading && <TableRow><TableCell colSpan={6} className="text-center py-6 text-muted-foreground">Carregando…</TableCell></TableRow>}
+              {surveysData?.surveys.map((s: any) => (
+                <TableRow key={s.id}>
+                  <TableCell className="text-sm">{s.empresa}</TableCell>
+                  <TableCell className="text-sm">
+                    <div>{s.user_name}</div>
+                    <div className="text-xs text-muted-foreground">{s.user_email}</div>
+                  </TableCell>
+                  <TableCell><Badge variant="outline">{s.satisfaction_score ?? "—"}</Badge></TableCell>
+                  <TableCell className="text-sm max-w-[260px] whitespace-pre-wrap">{s.favorite_feature || "—"}</TableCell>
+                  <TableCell className="text-sm max-w-[260px] whitespace-pre-wrap">{s.suggested_improvement || "—"}</TableCell>
+                  <TableCell className="text-xs text-muted-foreground">{new Date(s.created_at).toLocaleString("pt-BR")}</TableCell>
+                </TableRow>
+              ))}
+              {surveysData && surveysData.surveys.length === 0 && (
+                <TableRow><TableCell colSpan={6} className="text-center py-6 text-muted-foreground">Nenhuma resposta registrada.</TableCell></TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </Card>
+      ) : (
       <Card className="border-border bg-card/50 p-0 overflow-hidden">
         <Table>
           <TableHeader>
@@ -70,6 +113,7 @@ function LogsPage() {
           </TableBody>
         </Table>
       </Card>
+      )}
     </div>
   );
 }
