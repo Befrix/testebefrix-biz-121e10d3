@@ -31,6 +31,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
 import { Route as AuthenticatedDashboardUploadsRouteImport } from './routes/_authenticated/dashboard.uploads'
 import { Route as AuthenticatedDashboardSequenciasRouteImport } from './routes/_authenticated/dashboard.sequencias'
+import { Route as AuthenticatedDashboardRadarRouteImport } from './routes/_authenticated/dashboard.radar'
 import { Route as AuthenticatedDashboardPagamentosRouteImport } from './routes/_authenticated/dashboard.pagamentos'
 import { Route as AuthenticatedDashboardLeadsRouteImport } from './routes/_authenticated/dashboard.leads'
 import { Route as AuthenticatedDashboardInteligenciaRouteImport } from './routes/_authenticated/dashboard.inteligencia'
@@ -156,6 +157,12 @@ const AuthenticatedDashboardSequenciasRoute =
     path: '/sequencias',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const AuthenticatedDashboardRadarRoute =
+  AuthenticatedDashboardRadarRouteImport.update({
+    id: '/radar',
+    path: '/radar',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const AuthenticatedDashboardPagamentosRoute =
   AuthenticatedDashboardPagamentosRouteImport.update({
     id: '/pagamentos',
@@ -260,6 +267,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/inteligencia': typeof AuthenticatedDashboardInteligenciaRoute
   '/dashboard/leads': typeof AuthenticatedDashboardLeadsRoute
   '/dashboard/pagamentos': typeof AuthenticatedDashboardPagamentosRoute
+  '/dashboard/radar': typeof AuthenticatedDashboardRadarRoute
   '/dashboard/sequencias': typeof AuthenticatedDashboardSequenciasRoute
   '/dashboard/uploads': typeof AuthenticatedDashboardUploadsRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
@@ -293,6 +301,7 @@ export interface FileRoutesByTo {
   '/dashboard/inteligencia': typeof AuthenticatedDashboardInteligenciaRoute
   '/dashboard/leads': typeof AuthenticatedDashboardLeadsRoute
   '/dashboard/pagamentos': typeof AuthenticatedDashboardPagamentosRoute
+  '/dashboard/radar': typeof AuthenticatedDashboardRadarRoute
   '/dashboard/sequencias': typeof AuthenticatedDashboardSequenciasRoute
   '/dashboard/uploads': typeof AuthenticatedDashboardUploadsRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
@@ -330,6 +339,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/inteligencia': typeof AuthenticatedDashboardInteligenciaRoute
   '/_authenticated/dashboard/leads': typeof AuthenticatedDashboardLeadsRoute
   '/_authenticated/dashboard/pagamentos': typeof AuthenticatedDashboardPagamentosRoute
+  '/_authenticated/dashboard/radar': typeof AuthenticatedDashboardRadarRoute
   '/_authenticated/dashboard/sequencias': typeof AuthenticatedDashboardSequenciasRoute
   '/_authenticated/dashboard/uploads': typeof AuthenticatedDashboardUploadsRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
@@ -367,6 +377,7 @@ export interface FileRouteTypes {
     | '/dashboard/inteligencia'
     | '/dashboard/leads'
     | '/dashboard/pagamentos'
+    | '/dashboard/radar'
     | '/dashboard/sequencias'
     | '/dashboard/uploads'
     | '/dashboard/'
@@ -400,6 +411,7 @@ export interface FileRouteTypes {
     | '/dashboard/inteligencia'
     | '/dashboard/leads'
     | '/dashboard/pagamentos'
+    | '/dashboard/radar'
     | '/dashboard/sequencias'
     | '/dashboard/uploads'
     | '/dashboard'
@@ -436,6 +448,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/inteligencia'
     | '/_authenticated/dashboard/leads'
     | '/_authenticated/dashboard/pagamentos'
+    | '/_authenticated/dashboard/radar'
     | '/_authenticated/dashboard/sequencias'
     | '/_authenticated/dashboard/uploads'
     | '/_authenticated/dashboard/'
@@ -607,6 +620,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardSequenciasRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/dashboard/radar': {
+      id: '/_authenticated/dashboard/radar'
+      path: '/radar'
+      fullPath: '/dashboard/radar'
+      preLoaderRoute: typeof AuthenticatedDashboardRadarRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/_authenticated/dashboard/pagamentos': {
       id: '/_authenticated/dashboard/pagamentos'
       path: '/pagamentos'
@@ -707,6 +727,7 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardInteligenciaRoute: typeof AuthenticatedDashboardInteligenciaRoute
   AuthenticatedDashboardLeadsRoute: typeof AuthenticatedDashboardLeadsRoute
   AuthenticatedDashboardPagamentosRoute: typeof AuthenticatedDashboardPagamentosRoute
+  AuthenticatedDashboardRadarRoute: typeof AuthenticatedDashboardRadarRoute
   AuthenticatedDashboardSequenciasRoute: typeof AuthenticatedDashboardSequenciasRoute
   AuthenticatedDashboardUploadsRoute: typeof AuthenticatedDashboardUploadsRoute
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
@@ -732,6 +753,7 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
     AuthenticatedDashboardLeadsRoute: AuthenticatedDashboardLeadsRoute,
     AuthenticatedDashboardPagamentosRoute:
       AuthenticatedDashboardPagamentosRoute,
+    AuthenticatedDashboardRadarRoute: AuthenticatedDashboardRadarRoute,
     AuthenticatedDashboardSequenciasRoute:
       AuthenticatedDashboardSequenciasRoute,
     AuthenticatedDashboardUploadsRoute: AuthenticatedDashboardUploadsRoute,
@@ -797,3 +819,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
