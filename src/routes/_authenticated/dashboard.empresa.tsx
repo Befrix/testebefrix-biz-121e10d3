@@ -346,7 +346,7 @@ function SectionIcp({ initial, initialStrategy, plan, onSaved }: { initial: any;
   const currentTicket: string = initialStrategy?.ticket_medio || initial?.average_ticket || "";
   const isPreset = (ticketOpts as readonly string[]).includes(currentTicket);
 
-  const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<IcpForm>({
+  const form = useForm<IcpForm>({
     resolver: zodResolver(icpSchema),
     defaultValues: {
       niches: (initial?.niches as string[] | null) ?? [],
@@ -358,6 +358,21 @@ function SectionIcp({ initial, initialStrategy, plan, onSaved }: { initial: any;
       ticket_custom: isPreset ? "" : (currentTicket || ""),
     },
   });
+  const { register, handleSubmit, setValue, watch, formState: { errors } } = form;
+  useEffect(() => {
+    const ticket: string = initialStrategy?.ticket_medio || initial?.average_ticket || "";
+    const preset = (ticketOpts as readonly string[]).includes(ticket);
+    form.reset({
+      niches: (initial?.niches as string[] | null) ?? [],
+      target_company_size: arrToCsv(initial?.target_company_size),
+      target_regions: arrToCsv(initial?.target_regions),
+      target_roles: arrToCsv(initial?.target_roles),
+      preferred_segments: arrToCsv(initial?.preferred_segments),
+      ticket_choice: (preset ? ticket : (ticket ? "Outro" : "Até R$ 50.000")) as IcpForm["ticket_choice"],
+      ticket_custom: preset ? "" : (ticket || ""),
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initial, initialStrategy]);
   const niches = watch("niches"); const ticketChoice = watch("ticket_choice");
 
   const onSubmit = async (v: IcpForm) => {
