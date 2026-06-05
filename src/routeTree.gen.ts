@@ -36,6 +36,7 @@ import { Route as AuthenticatedDashboardInteligenciaRouteImport } from './routes
 import { Route as AuthenticatedDashboardIntegracoesRouteImport } from './routes/_authenticated/dashboard.integracoes'
 import { Route as AuthenticatedDashboardInboxRouteImport } from './routes/_authenticated/dashboard.inbox'
 import { Route as AuthenticatedDashboardEventosRouteImport } from './routes/_authenticated/dashboard.eventos'
+import { Route as AuthenticatedDashboardEmpresaRouteImport } from './routes/_authenticated/dashboard.empresa'
 import { Route as AuthenticatedDashboardCampanhasRouteImport } from './routes/_authenticated/dashboard.campanhas'
 import { Route as AuthenticatedDashboardAutomationsRouteImport } from './routes/_authenticated/dashboard.automations'
 import { Route as AuthenticatedDashboardAutomacoesRouteImport } from './routes/_authenticated/dashboard.automacoes'
@@ -184,6 +185,12 @@ const AuthenticatedDashboardEventosRoute =
     path: '/eventos',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const AuthenticatedDashboardEmpresaRoute =
+  AuthenticatedDashboardEmpresaRouteImport.update({
+    id: '/empresa',
+    path: '/empresa',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const AuthenticatedDashboardCampanhasRoute =
   AuthenticatedDashboardCampanhasRouteImport.update({
     id: '/campanhas',
@@ -231,6 +238,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/automacoes': typeof AuthenticatedDashboardAutomacoesRoute
   '/dashboard/automations': typeof AuthenticatedDashboardAutomationsRoute
   '/dashboard/campanhas': typeof AuthenticatedDashboardCampanhasRoute
+  '/dashboard/empresa': typeof AuthenticatedDashboardEmpresaRoute
   '/dashboard/eventos': typeof AuthenticatedDashboardEventosRoute
   '/dashboard/inbox': typeof AuthenticatedDashboardInboxRoute
   '/dashboard/integracoes': typeof AuthenticatedDashboardIntegracoesRoute
@@ -261,6 +269,7 @@ export interface FileRoutesByTo {
   '/dashboard/automacoes': typeof AuthenticatedDashboardAutomacoesRoute
   '/dashboard/automations': typeof AuthenticatedDashboardAutomationsRoute
   '/dashboard/campanhas': typeof AuthenticatedDashboardCampanhasRoute
+  '/dashboard/empresa': typeof AuthenticatedDashboardEmpresaRoute
   '/dashboard/eventos': typeof AuthenticatedDashboardEventosRoute
   '/dashboard/inbox': typeof AuthenticatedDashboardInboxRoute
   '/dashboard/integracoes': typeof AuthenticatedDashboardIntegracoesRoute
@@ -295,6 +304,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/automacoes': typeof AuthenticatedDashboardAutomacoesRoute
   '/_authenticated/dashboard/automations': typeof AuthenticatedDashboardAutomationsRoute
   '/_authenticated/dashboard/campanhas': typeof AuthenticatedDashboardCampanhasRoute
+  '/_authenticated/dashboard/empresa': typeof AuthenticatedDashboardEmpresaRoute
   '/_authenticated/dashboard/eventos': typeof AuthenticatedDashboardEventosRoute
   '/_authenticated/dashboard/inbox': typeof AuthenticatedDashboardInboxRoute
   '/_authenticated/dashboard/integracoes': typeof AuthenticatedDashboardIntegracoesRoute
@@ -329,6 +339,7 @@ export interface FileRouteTypes {
     | '/dashboard/automacoes'
     | '/dashboard/automations'
     | '/dashboard/campanhas'
+    | '/dashboard/empresa'
     | '/dashboard/eventos'
     | '/dashboard/inbox'
     | '/dashboard/integracoes'
@@ -359,6 +370,7 @@ export interface FileRouteTypes {
     | '/dashboard/automacoes'
     | '/dashboard/automations'
     | '/dashboard/campanhas'
+    | '/dashboard/empresa'
     | '/dashboard/eventos'
     | '/dashboard/inbox'
     | '/dashboard/integracoes'
@@ -392,6 +404,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/automacoes'
     | '/_authenticated/dashboard/automations'
     | '/_authenticated/dashboard/campanhas'
+    | '/_authenticated/dashboard/empresa'
     | '/_authenticated/dashboard/eventos'
     | '/_authenticated/dashboard/inbox'
     | '/_authenticated/dashboard/integracoes'
@@ -604,6 +617,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardEventosRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/dashboard/empresa': {
+      id: '/_authenticated/dashboard/empresa'
+      path: '/empresa'
+      fullPath: '/dashboard/empresa'
+      preLoaderRoute: typeof AuthenticatedDashboardEmpresaRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/_authenticated/dashboard/campanhas': {
       id: '/_authenticated/dashboard/campanhas'
       path: '/campanhas'
@@ -640,6 +660,7 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardAutomacoesRoute: typeof AuthenticatedDashboardAutomacoesRoute
   AuthenticatedDashboardAutomationsRoute: typeof AuthenticatedDashboardAutomationsRoute
   AuthenticatedDashboardCampanhasRoute: typeof AuthenticatedDashboardCampanhasRoute
+  AuthenticatedDashboardEmpresaRoute: typeof AuthenticatedDashboardEmpresaRoute
   AuthenticatedDashboardEventosRoute: typeof AuthenticatedDashboardEventosRoute
   AuthenticatedDashboardInboxRoute: typeof AuthenticatedDashboardInboxRoute
   AuthenticatedDashboardIntegracoesRoute: typeof AuthenticatedDashboardIntegracoesRoute
@@ -659,6 +680,7 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
     AuthenticatedDashboardAutomationsRoute:
       AuthenticatedDashboardAutomationsRoute,
     AuthenticatedDashboardCampanhasRoute: AuthenticatedDashboardCampanhasRoute,
+    AuthenticatedDashboardEmpresaRoute: AuthenticatedDashboardEmpresaRoute,
     AuthenticatedDashboardEventosRoute: AuthenticatedDashboardEventosRoute,
     AuthenticatedDashboardInboxRoute: AuthenticatedDashboardInboxRoute,
     AuthenticatedDashboardIntegracoesRoute:
