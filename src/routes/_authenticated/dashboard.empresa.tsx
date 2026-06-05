@@ -273,7 +273,7 @@ type OfertaForm = z.input<typeof ofertaSchema>;
 
 function SectionOferta({ initial, onSaved }: { initial: any; onSaved: () => void }) {
   const [saving, setSaving] = useState(false);
-  const { register, handleSubmit, formState: { errors } } = useForm<OfertaForm>({
+  const form = useForm<OfertaForm>({
     resolver: zodResolver(ofertaSchema),
     defaultValues: {
       offer: initial?.offer ?? "", cta: initial?.cta ?? "",
@@ -281,6 +281,15 @@ function SectionOferta({ initial, onSaved }: { initial: any; onSaved: () => void
       differentials: arrToCsv(initial?.differentials), keywords: arrToCsv(initial?.keywords),
     },
   });
+  const { register, handleSubmit, formState: { errors } } = form;
+  useEffect(() => {
+    form.reset({
+      offer: initial?.offer ?? "", cta: initial?.cta ?? "",
+      target_audience: initial?.target_audience ?? "",
+      differentials: arrToCsv(initial?.differentials), keywords: arrToCsv(initial?.keywords),
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initial]);
   const onSubmit = async (v: OfertaForm) => {
     setSaving(true);
     const { error } = await supabase.from("client_strategy_profiles").update({
