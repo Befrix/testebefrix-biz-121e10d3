@@ -305,7 +305,8 @@ function Index() {
             <GlowOrb className="-bottom-40 right-0" variant="accent" size="md" />
             <div className="relative">
               <h2 className="mx-auto max-w-3xl text-balance text-4xl font-semibold tracking-tight md:text-6xl">
-                Pronto para gerar mais oportunidades com menos esforço?
+                Pronto para gerar mais oportunidades com{" "}
+                <span className="text-gradient-primary">menos esforço</span>?
               </h2>
               <p className="mx-auto mt-5 max-w-xl text-muted-foreground md:text-lg">
                 Centralize prospecção, automação, inteligência comercial e acompanhamento de resultados em uma única plataforma.
