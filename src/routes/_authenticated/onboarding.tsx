@@ -132,11 +132,11 @@ const stepsMeta = [
   { id: 1, icon: Sparkles, title: "Oferta", desc: "O que você vende",
     helper: "Essas informações ajudam a BEFRIX a compreender sua oferta, diferenciais e objetivos comerciais para gerar campanhas e estratégias mais alinhadas ao seu negócio." },
   { id: 2, icon: Target, title: "ICP & Nichos", desc: "Quem é seu cliente perfeito",
-    helper: "Essas informações ajudam a BEFRIX a identificar empresas e contatos com maior potencial de conversão." },
+    helper: "Essas informações ajudam a BEFRIX a identificar empresas e contatos com maior potencial de conversão para o seu negócio. Selecione também os segmentos que deseja atender para personalizar pesquisas, campanhas e oportunidades comerciais." },
   { id: 3, icon: Flame, title: "Dores & estratégia", desc: "Contexto para a IA escrever",
-    helper: "Quanto melhor a BEFRIX entender os desafios dos seus clientes, mais precisas serão as oportunidades e recomendações apresentadas." },
+    helper: "Quanto melhor a BEFRIX entender as dores dos seus clientes, mais precisas serão as oportunidades, abordagens e estratégias sugeridas para sua operação." },
   { id: 4, icon: Goal, title: "Objetivos", desc: "Onde você quer chegar",
-    helper: "Informe os resultados que deseja alcançar para direcionar melhor sua operação." },
+    helper: "Informe os resultados que deseja alcançar. A BEFRIX utilizará essas informações para direcionar a operação para metas mais alinhadas ao seu crescimento." },
   { id: 5, icon: Radio, title: "Canais & calendário", desc: "Onde a máquina opera", helper: null },
 ] as const;
 

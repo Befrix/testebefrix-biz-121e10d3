@@ -147,9 +147,20 @@ function Index() {
                 <ArrowRight className="ml-1 h-4 w-4" />
               </Link>
             </Button>
-            <Button size="lg" variant="outline" className="glass border-border hover:bg-surface-elevated">
-              <PlayCircle className="mr-1 h-4 w-4" />
-              Agendar demonstração
+            <Button
+              asChild
+              size="lg"
+              variant="outline"
+              className="glass border-border hover:bg-surface-elevated"
+            >
+              <a
+                href={`https://wa.me/5511999999999?text=${encodeURIComponent("Olá, gostaria de agendar uma demonstração da BEFRIX.")}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <PlayCircle className="mr-1 h-4 w-4" />
+                Agendar demonstração
+              </a>
             </Button>
           </motion.div>
 

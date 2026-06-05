@@ -30,7 +30,7 @@ function IntegracoesPage() {
 
   return (
     <div className="space-y-8">
-      <PageHeader title="Integrações" description="Conecte seus canais de outbound e ferramentas." icon={Plug} />
+      <PageHeader title="Integrações" description="Conecte suas ferramentas para que a BEFRIX possa centralizar informações e acompanhar sua operação de forma mais completa." icon={Plug} />
       <div className="grid gap-4 md:grid-cols-2">
         {CATALOG.map((c) => {
           const conn = data?.find((d) => d.provider === c.provider);
