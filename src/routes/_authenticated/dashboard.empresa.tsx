@@ -546,10 +546,15 @@ type ObjForm = z.input<typeof objSchema>;
 
 function SectionObjetivos({ initial, onSaved }: { initial: any; onSaved: () => void }) {
   const [saving, setSaving] = useState(false);
-  const { handleSubmit, setValue, watch, formState: { errors } } = useForm<ObjForm>({
+  const form = useForm<ObjForm>({
     resolver: zodResolver(objSchema),
     defaultValues: { objetivos: (initial?.objetivos as string[] | null) ?? [] },
   });
+  const { handleSubmit, setValue, watch, formState: { errors } } = form;
+  useEffect(() => {
+    form.reset({ objetivos: (initial?.objetivos as string[] | null) ?? [] });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initial]);
   const objetivos = watch("objetivos");
   const onSubmit = async (v: ObjForm) => {
     setSaving(true);
