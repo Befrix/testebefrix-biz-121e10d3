@@ -103,7 +103,7 @@ function LeadsPage() {
     <div className="space-y-8">
       <PageHeader
         title="Leads"
-        description="Pipeline SDR e base de prospecção."
+        description="Sua base de prospecção centralizada. O Score de Leads da BEFRIX prioriza automaticamente quem tem maior chance de fechar, para você focar nos contatos certos."
         icon={Users}
         action={
           <div className="flex items-center gap-2">

@@ -83,7 +83,7 @@ function EventosPage() {
     <div className="space-y-8">
       <PageHeader
         title="Eventos"
-        description="Importe participantes de feiras, congressos e meetups. Os leads são enriquecidos automaticamente."
+        description="Transforme listas de participantes de feiras, congressos e meetups em leads qualificados. A BEFRIX enriquece os contatos automaticamente e prepara para o outbound."
         icon={CalendarDays}
       />
       <FeatureGate

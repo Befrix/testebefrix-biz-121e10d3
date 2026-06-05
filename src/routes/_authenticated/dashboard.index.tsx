@@ -135,7 +135,7 @@ function DashboardHome() {
     <div className="space-y-8">
       <PageHeader
         title="Dashboard"
-        description="Sua máquina de outbound intelligence em tempo real."
+        description="Acompanhe em tempo real os resultados da sua operação BEFRIX: leads capturados, conversas em andamento, reuniões agendadas e receita gerada — tudo em um só lugar."
         icon={Sparkles}
       />
 

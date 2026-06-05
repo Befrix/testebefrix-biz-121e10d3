@@ -67,7 +67,7 @@ const intelligence = [
 ];
 
 const steps = [
-  { icon: UserPlus, title: "Crie sua conta", desc: "Setup em menos de 2 minutos, sem cartão de crédito." },
+  { icon: UserPlus, title: "Crie sua conta", desc: "Setup em menos de 2 minutos. Comece grátis." },
   { icon: Settings2, title: "Configure seu ICP", desc: "Defina persona, indústria e gatilhos de compra ideais." },
   { icon: CreditCard, title: "Escolha seu plano", desc: "Flexível e escalável conforme seu volume de prospecção." },
   { icon: Upload, title: "Importe eventos", desc: "Conecte CRM, calendário e fontes de dados em um clique." },
@@ -313,7 +313,7 @@ function Index() {
                 </Button>
               </div>
               <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-xs text-muted-foreground">
-                {["Sem cartão de crédito", "Setup em 2 minutos", "Cancele quando quiser"].map((t) => (
+                {["Comece grátis", "Setup em 2 minutos", "Cancele quando quiser"].map((t) => (
                   <span key={t} className="inline-flex items-center gap-1.5">
                     <CheckCircle2 className="h-3.5 w-3.5 text-success" /> {t}
                   </span>
