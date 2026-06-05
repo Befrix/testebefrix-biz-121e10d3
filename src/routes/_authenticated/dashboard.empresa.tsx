@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
@@ -162,7 +162,7 @@ type EmpresaForm = z.input<typeof empresaSchema>;
 
 function SectionEmpresa({ initial, profile, userId, onSaved }: { initial: any; profile: any; userId: string; onSaved: () => void }) {
   const [saving, setSaving] = useState(false);
-  const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<EmpresaForm>({
+  const form = useForm<EmpresaForm>({
     resolver: zodResolver(empresaSchema),
     defaultValues: {
       razao_social: initial?.razao_social ?? "",
@@ -175,6 +175,20 @@ function SectionEmpresa({ initial, profile, userId, onSaved }: { initial: any; p
       phone: profile?.phone ?? "",
     },
   });
+  const { register, handleSubmit, setValue, watch, formState: { errors } } = form;
+  useEffect(() => {
+    form.reset({
+      razao_social: initial?.razao_social ?? "",
+      nome_fantasia: initial?.nome_fantasia ?? initial?.company_name ?? "",
+      cnpj: initial?.cnpj ? maskCNPJ(initial.cnpj) : "",
+      company_website: initial?.company_website ?? "",
+      company_segment: initial?.company_segment ?? "",
+      company_size: (initial?.company_size as EmpresaForm["company_size"]) ?? "11-50",
+      faturamento_anual: (initial?.faturamento_anual as EmpresaForm["faturamento_anual"]) ?? "Até R$ 500 mil",
+      phone: profile?.phone ?? "",
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initial, profile]);
   const cnpjV = watch("cnpj"); const sizeV = watch("company_size"); const fatV = watch("faturamento_anual");
 
   const onSubmit = async (v: EmpresaForm) => {
@@ -259,7 +273,7 @@ type OfertaForm = z.input<typeof ofertaSchema>;
 
 function SectionOferta({ initial, onSaved }: { initial: any; onSaved: () => void }) {
   const [saving, setSaving] = useState(false);
-  const { register, handleSubmit, formState: { errors } } = useForm<OfertaForm>({
+  const form = useForm<OfertaForm>({
     resolver: zodResolver(ofertaSchema),
     defaultValues: {
       offer: initial?.offer ?? "", cta: initial?.cta ?? "",
@@ -267,6 +281,15 @@ function SectionOferta({ initial, onSaved }: { initial: any; onSaved: () => void
       differentials: arrToCsv(initial?.differentials), keywords: arrToCsv(initial?.keywords),
     },
   });
+  const { register, handleSubmit, formState: { errors } } = form;
+  useEffect(() => {
+    form.reset({
+      offer: initial?.offer ?? "", cta: initial?.cta ?? "",
+      target_audience: initial?.target_audience ?? "",
+      differentials: arrToCsv(initial?.differentials), keywords: arrToCsv(initial?.keywords),
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initial]);
   const onSubmit = async (v: OfertaForm) => {
     setSaving(true);
     const { error } = await supabase.from("client_strategy_profiles").update({
@@ -323,7 +346,7 @@ function SectionIcp({ initial, initialStrategy, plan, onSaved }: { initial: any;
   const currentTicket: string = initialStrategy?.ticket_medio || initial?.average_ticket || "";
   const isPreset = (ticketOpts as readonly string[]).includes(currentTicket);
 
-  const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<IcpForm>({
+  const form = useForm<IcpForm>({
     resolver: zodResolver(icpSchema),
     defaultValues: {
       niches: (initial?.niches as string[] | null) ?? [],
@@ -335,6 +358,21 @@ function SectionIcp({ initial, initialStrategy, plan, onSaved }: { initial: any;
       ticket_custom: isPreset ? "" : (currentTicket || ""),
     },
   });
+  const { register, handleSubmit, setValue, watch, formState: { errors } } = form;
+  useEffect(() => {
+    const ticket: string = initialStrategy?.ticket_medio || initial?.average_ticket || "";
+    const preset = (ticketOpts as readonly string[]).includes(ticket);
+    form.reset({
+      niches: (initial?.niches as string[] | null) ?? [],
+      target_company_size: arrToCsv(initial?.target_company_size),
+      target_regions: arrToCsv(initial?.target_regions),
+      target_roles: arrToCsv(initial?.target_roles),
+      preferred_segments: arrToCsv(initial?.preferred_segments),
+      ticket_choice: (preset ? ticket : (ticket ? "Outro" : "Até R$ 50.000")) as IcpForm["ticket_choice"],
+      ticket_custom: preset ? "" : (ticket || ""),
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initial, initialStrategy]);
   const niches = watch("niches"); const ticketChoice = watch("ticket_choice");
 
   const onSubmit = async (v: IcpForm) => {
@@ -415,7 +453,7 @@ type PainForm = z.input<typeof painSchema>;
 
 function SectionPain({ initial, onSaved }: { initial: any; onSaved: () => void }) {
   const [saving, setSaving] = useState(false);
-  const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<PainForm>({
+  const form = useForm<PainForm>({
     resolver: zodResolver(painSchema),
     defaultValues: {
       main_pain: initial?.main_pain ?? "",
@@ -429,6 +467,21 @@ function SectionPain({ initial, onSaved }: { initial: any; onSaved: () => void }
       forbidden_words: arrToCsv(initial?.forbidden_words),
     },
   });
+  const { register, handleSubmit, setValue, watch, formState: { errors } } = form;
+  useEffect(() => {
+    form.reset({
+      main_pain: initial?.main_pain ?? "",
+      secondary_pains: arrToCsv(initial?.secondary_pains),
+      problems_solved: arrToCsv(initial?.problems_solved),
+      objections: arrToCsv(initial?.objections),
+      biggest_challenges: initial?.biggest_challenges ?? "",
+      desired_result: initial?.desired_result ?? "",
+      communication_style: (initial?.communication_style as PainForm["communication_style"]) ?? "objetivo",
+      tone_of_voice: (initial?.tone_of_voice as PainForm["tone_of_voice"]) ?? "consultivo",
+      forbidden_words: arrToCsv(initial?.forbidden_words),
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initial]);
   const onSubmit = async (v: PainForm) => {
     setSaving(true);
     const { error } = await supabase.from("client_strategy_profiles").update({
@@ -493,10 +546,15 @@ type ObjForm = z.input<typeof objSchema>;
 
 function SectionObjetivos({ initial, onSaved }: { initial: any; onSaved: () => void }) {
   const [saving, setSaving] = useState(false);
-  const { handleSubmit, setValue, watch, formState: { errors } } = useForm<ObjForm>({
+  const form = useForm<ObjForm>({
     resolver: zodResolver(objSchema),
     defaultValues: { objetivos: (initial?.objetivos as string[] | null) ?? [] },
   });
+  const { handleSubmit, setValue, watch, formState: { errors } } = form;
+  useEffect(() => {
+    form.reset({ objetivos: (initial?.objetivos as string[] | null) ?? [] });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initial]);
   const objetivos = watch("objetivos");
   const onSubmit = async (v: ObjForm) => {
     setSaving(true);
