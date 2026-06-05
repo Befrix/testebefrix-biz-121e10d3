@@ -133,7 +133,7 @@ function PagamentosPage() {
         action,
         entity: "subscription",
         entity_id: data.subscription?.id ?? null,
-        metadata,
+        metadata: metadata as any,
       });
       if (auditErr) throw auditErr;
 
