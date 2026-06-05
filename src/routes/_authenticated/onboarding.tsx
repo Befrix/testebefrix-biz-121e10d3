@@ -320,8 +320,8 @@ function OnboardingPage() {
         ),
       );
     }
-    toast.success("Onboarding concluído. Escolha seu plano para ativar.");
-    navigate({ to: "/planos" });
+    toast.success("Onboarding concluído. Bem-vindo à BEFRIX!");
+    navigate({ to: "/dashboard" });
   };
 
   const onInvalid = () => toast.error(REQUIRED_MSG);

@@ -50,7 +50,7 @@ function RegisterPage() {
   const sizeValue = watch("company_size");
 
   useEffect(() => {
-    if (user) navigate({ to: "/dashboard", replace: true });
+    if (user) navigate({ to: "/planos", replace: true });
   }, [user, navigate]);
 
   const onSubmit = async (values: RegisterValues) => {
