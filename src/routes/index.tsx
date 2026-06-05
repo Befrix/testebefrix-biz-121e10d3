@@ -7,7 +7,6 @@ import {
   Brain,
   Calendar,
   ChartLine,
-  CheckCircle2,
   Clock,
   LineChart,
   Mail,
