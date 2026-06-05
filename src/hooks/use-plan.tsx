@@ -11,6 +11,7 @@ export type PlanFeatures = {
     leads_per_month: number | null;
     users: number | null;
     niches: number | null; // null = ilimitado
+    daily_contacts: number | null; // null = ilimitado
   };
   features: string[];
   channels: {
