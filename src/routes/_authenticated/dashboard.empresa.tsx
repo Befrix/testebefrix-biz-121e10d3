@@ -453,7 +453,7 @@ type PainForm = z.input<typeof painSchema>;
 
 function SectionPain({ initial, onSaved }: { initial: any; onSaved: () => void }) {
   const [saving, setSaving] = useState(false);
-  const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<PainForm>({
+  const form = useForm<PainForm>({
     resolver: zodResolver(painSchema),
     defaultValues: {
       main_pain: initial?.main_pain ?? "",
@@ -467,6 +467,21 @@ function SectionPain({ initial, onSaved }: { initial: any; onSaved: () => void }
       forbidden_words: arrToCsv(initial?.forbidden_words),
     },
   });
+  const { register, handleSubmit, setValue, watch, formState: { errors } } = form;
+  useEffect(() => {
+    form.reset({
+      main_pain: initial?.main_pain ?? "",
+      secondary_pains: arrToCsv(initial?.secondary_pains),
+      problems_solved: arrToCsv(initial?.problems_solved),
+      objections: arrToCsv(initial?.objections),
+      biggest_challenges: initial?.biggest_challenges ?? "",
+      desired_result: initial?.desired_result ?? "",
+      communication_style: (initial?.communication_style as PainForm["communication_style"]) ?? "objetivo",
+      tone_of_voice: (initial?.tone_of_voice as PainForm["tone_of_voice"]) ?? "consultivo",
+      forbidden_words: arrToCsv(initial?.forbidden_words),
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initial]);
   const onSubmit = async (v: PainForm) => {
     setSaving(true);
     const { error } = await supabase.from("client_strategy_profiles").update({
