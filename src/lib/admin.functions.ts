@@ -352,3 +352,50 @@ export const updatePlatformSetting = createServerFn({ method: "POST" })
     });
     return { ok: true };
   });
+
+// ---------- LEGAL DOCUMENT CONSENTS ----------
+export const listLegalConsents = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((i) => z.object({ document_id: z.string().optional() }).parse(i || {}))
+  .handler(async ({ context, data }) => {
+    await ensurePlatformAdmin(context.supabase, context.userId);
+    const sb = await admin();
+    const { data: rows, error } = await sb
+      .from("audit_logs")
+      .select("id, tenant_id, user_id, created_at, metadata")
+      .eq("action", "document_accepted")
+      .eq("entity", "legal_document")
+      .order("created_at", { ascending: false })
+      .limit(500);
+    if (error) throw new Error(error.message);
+
+    const tenantIds = Array.from(new Set((rows || []).map((r) => r.tenant_id).filter(Boolean))) as string[];
+    const userIds = Array.from(new Set((rows || []).map((r) => r.user_id).filter(Boolean))) as string[];
+    const [{ data: tenants }, { data: profiles }] = await Promise.all([
+      tenantIds.length ? sb.from("tenants").select("id, name").in("id", tenantIds) : Promise.resolve({ data: [] as any[] }),
+      userIds.length ? sb.from("profiles").select("id, full_name, email").in("id", userIds) : Promise.resolve({ data: [] as any[] }),
+    ]);
+    const tn = new Map((tenants || []).map((t: any) => [t.id, t.name]));
+    const pn = new Map((profiles || []).map((p: any) => [p.id, p]));
+
+    const consents = (rows || [])
+      .map((r) => {
+        const meta = (r.metadata as any) || {};
+        if (data.document_id && meta.document_id !== data.document_id) return null;
+        const prof = pn.get(r.user_id || "") as any;
+        return {
+          id: r.id,
+          tenant: tn.get(r.tenant_id || "") || "—",
+          user_name: prof?.full_name || "—",
+          user_email: prof?.email || "—",
+          document_id: meta.document_id || "—",
+          document_title: meta.document_title || "—",
+          version: meta.version || "—",
+          status: meta.status || "accepted",
+          source: meta.source || "—",
+          created_at: r.created_at,
+        };
+      })
+      .filter(Boolean);
+    return { consents };
+  });

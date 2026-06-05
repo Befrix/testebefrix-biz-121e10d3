@@ -22,6 +22,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { usePlan } from "@/hooks/use-plan";
 import { maskCNPJ, isValidCNPJ, onlyDigits } from "@/lib/cnpj";
+import { ONBOARDING_REQUIRED_DOCS, recordLegalConsent } from "@/lib/legal-docs";
+import { DocViewer } from "@/components/legal/doc-viewer";
 
 export const Route = createFileRoute("/_authenticated/onboarding")({
   head: () => ({
@@ -119,6 +121,8 @@ const channelsSchema = z.object({
   window_end: z.string().regex(/^\d{2}:\d{2}$/).default("18:00"),
   email_signature: z.string().trim().max(500).optional().or(z.literal("")),
   calendar_url: z.string().trim().url("URL inválida").max(255).or(z.literal("")),
+  accept_termo_uso: z.literal(true, { message: "Aceite o Termo de Uso para continuar." }),
+  accept_politica_privacidade: z.literal(true, { message: "Aceite a Política de Privacidade para continuar." }),
 });
 type ChannelsForm = z.input<typeof channelsSchema>;
 
@@ -285,6 +289,9 @@ function OnboardingPage() {
         return toast.error(`Seu plano atual permite até ${dailyMax} contatos/dia por canal.`);
       }
     }
+    if (!v.accept_termo_uso || !v.accept_politica_privacidade) {
+      return toast.error("Você precisa aceitar o Termo de Uso e a Política de Privacidade para concluir.");
+    }
     setSaving(true);
     const [stratRes, empRes] = await Promise.all([
       supabase.from("client_strategy_profiles").update({
@@ -305,6 +312,14 @@ function OnboardingPage() {
     setSaving(false);
     if (stratRes.error) return toast.error(stratRes.error.message);
     if (empRes.error) return toast.error(empRes.error.message);
+    const tenantId = (state.empresa as any)?.tenant_id || (state.profile as any)?.tenant_id;
+    if (tenantId) {
+      await Promise.all(
+        ONBOARDING_REQUIRED_DOCS.map((doc) =>
+          recordLegalConsent({ supabase, tenantId, userId: user!.id, doc, source: "onboarding" }),
+        ),
+      );
+    }
     toast.success("Onboarding concluído. Escolha seu plano para ativar.");
     navigate({ to: "/planos" });
   };
@@ -816,9 +831,13 @@ function StepChannels({
       window_end: sw.end ?? "18:00",
       email_signature: initialStrategy?.email_signature ?? "",
       calendar_url: initialEmpresa?.calendar_url ?? "",
+      accept_termo_uso: false as unknown as true,
+      accept_politica_privacidade: false as unknown as true,
     },
   });
   const channels = watch("channels_enabled") ?? [];
+  const acceptTermo = watch("accept_termo_uso" as any) as unknown as boolean;
+  const acceptPriv = watch("accept_politica_privacidade" as any) as unknown as boolean;
   const toggle = (c: "email" | "whatsapp", v: boolean) => {
     const set = new Set(channels);
     if (v) set.add(c); else set.delete(c);
@@ -887,6 +906,48 @@ function StepChannels({
         >
           <Input {...register("calendar_url")} placeholder="https://cal.com/seu-handle/intro" />
         </Field>
+
+        <div className="rounded-xl border border-border bg-secondary/20 p-4">
+          <p className="mb-3 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            Documentos da plataforma
+          </p>
+          <div className="space-y-3">
+            {ONBOARDING_REQUIRED_DOCS.map((doc) => {
+              const fieldName =
+                doc.id === "termo_uso" ? "accept_termo_uso" : "accept_politica_privacidade";
+              const checked = fieldName === "accept_termo_uso" ? acceptTermo : acceptPriv;
+              const err =
+                fieldName === "accept_termo_uso"
+                  ? (errors as any).accept_termo_uso?.message
+                  : (errors as any).accept_politica_privacidade?.message;
+              return (
+                <div key={doc.id} className="flex items-start gap-3">
+                  <Checkbox
+                    id={fieldName}
+                    checked={!!checked}
+                    onCheckedChange={(v) =>
+                      setValue(fieldName as any, (!!v) as any, { shouldValidate: true })
+                    }
+                    className="mt-0.5"
+                  />
+                  <div className="flex-1 text-sm">
+                    <Label htmlFor={fieldName} className="cursor-pointer leading-snug">
+                      {doc.acceptanceLabel}{" "}
+                      <span className="text-xs text-muted-foreground">(v. {doc.version})</span>
+                    </Label>
+                    <div className="mt-1">
+                      <DocViewer doc={doc} />
+                    </div>
+                    {err && <p className="mt-1 text-[11px] text-destructive">{String(err)}</p>}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <p className="mt-3 text-[11px] text-muted-foreground">
+            O Contrato de Prestação de Serviços SaaS será apresentado para aceite após a confirmação do pagamento do plano contratado.
+          </p>
+        </div>
       </div>
       <Footer onBack={onBack} saving={saving} last />
     </form>

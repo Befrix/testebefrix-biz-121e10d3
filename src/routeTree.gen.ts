@@ -25,6 +25,7 @@ import { Route as AdminEventosRouteImport } from './routes/admin/eventos'
 import { Route as AdminDashboardRouteImport } from './routes/admin/dashboard'
 import { Route as AdminConfiguracoesRouteImport } from './routes/admin/configuracoes'
 import { Route as AdminClientesRouteImport } from './routes/admin/clientes'
+import { Route as AdminAceitesRouteImport } from './routes/admin/aceites'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard.index'
@@ -37,6 +38,7 @@ import { Route as AuthenticatedDashboardIntegracoesRouteImport } from './routes/
 import { Route as AuthenticatedDashboardInboxRouteImport } from './routes/_authenticated/dashboard.inbox'
 import { Route as AuthenticatedDashboardEventosRouteImport } from './routes/_authenticated/dashboard.eventos'
 import { Route as AuthenticatedDashboardEmpresaRouteImport } from './routes/_authenticated/dashboard.empresa'
+import { Route as AuthenticatedDashboardDocumentosRouteImport } from './routes/_authenticated/dashboard.documentos'
 import { Route as AuthenticatedDashboardCampanhasRouteImport } from './routes/_authenticated/dashboard.campanhas'
 import { Route as AuthenticatedDashboardAutomationsRouteImport } from './routes/_authenticated/dashboard.automations'
 import { Route as AuthenticatedDashboardAutomacoesRouteImport } from './routes/_authenticated/dashboard.automacoes'
@@ -121,6 +123,11 @@ const AdminClientesRoute = AdminClientesRouteImport.update({
   path: '/clientes',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminAceitesRoute = AdminAceitesRouteImport.update({
+  id: '/aceites',
+  path: '/aceites',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
@@ -191,6 +198,12 @@ const AuthenticatedDashboardEmpresaRoute =
     path: '/empresa',
     getParentRoute: () => AuthenticatedDashboardRoute,
   } as any)
+const AuthenticatedDashboardDocumentosRoute =
+  AuthenticatedDashboardDocumentosRouteImport.update({
+    id: '/documentos',
+    path: '/documentos',
+    getParentRoute: () => AuthenticatedDashboardRoute,
+  } as any)
 const AuthenticatedDashboardCampanhasRoute =
   AuthenticatedDashboardCampanhasRouteImport.update({
     id: '/campanhas',
@@ -225,6 +238,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/onboarding': typeof AuthenticatedOnboardingRoute
+  '/admin/aceites': typeof AdminAceitesRoute
   '/admin/clientes': typeof AdminClientesRoute
   '/admin/configuracoes': typeof AdminConfiguracoesRoute
   '/admin/dashboard': typeof AdminDashboardRoute
@@ -238,6 +252,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/automacoes': typeof AuthenticatedDashboardAutomacoesRoute
   '/dashboard/automations': typeof AuthenticatedDashboardAutomationsRoute
   '/dashboard/campanhas': typeof AuthenticatedDashboardCampanhasRoute
+  '/dashboard/documentos': typeof AuthenticatedDashboardDocumentosRoute
   '/dashboard/empresa': typeof AuthenticatedDashboardEmpresaRoute
   '/dashboard/eventos': typeof AuthenticatedDashboardEventosRoute
   '/dashboard/inbox': typeof AuthenticatedDashboardInboxRoute
@@ -256,6 +271,7 @@ export interface FileRoutesByTo {
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
+  '/admin/aceites': typeof AdminAceitesRoute
   '/admin/clientes': typeof AdminClientesRoute
   '/admin/configuracoes': typeof AdminConfiguracoesRoute
   '/admin/dashboard': typeof AdminDashboardRoute
@@ -269,6 +285,7 @@ export interface FileRoutesByTo {
   '/dashboard/automacoes': typeof AuthenticatedDashboardAutomacoesRoute
   '/dashboard/automations': typeof AuthenticatedDashboardAutomationsRoute
   '/dashboard/campanhas': typeof AuthenticatedDashboardCampanhasRoute
+  '/dashboard/documentos': typeof AuthenticatedDashboardDocumentosRoute
   '/dashboard/empresa': typeof AuthenticatedDashboardEmpresaRoute
   '/dashboard/eventos': typeof AuthenticatedDashboardEventosRoute
   '/dashboard/inbox': typeof AuthenticatedDashboardInboxRoute
@@ -291,6 +308,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRouteWithChildren
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
+  '/admin/aceites': typeof AdminAceitesRoute
   '/admin/clientes': typeof AdminClientesRoute
   '/admin/configuracoes': typeof AdminConfiguracoesRoute
   '/admin/dashboard': typeof AdminDashboardRoute
@@ -304,6 +322,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/automacoes': typeof AuthenticatedDashboardAutomacoesRoute
   '/_authenticated/dashboard/automations': typeof AuthenticatedDashboardAutomationsRoute
   '/_authenticated/dashboard/campanhas': typeof AuthenticatedDashboardCampanhasRoute
+  '/_authenticated/dashboard/documentos': typeof AuthenticatedDashboardDocumentosRoute
   '/_authenticated/dashboard/empresa': typeof AuthenticatedDashboardEmpresaRoute
   '/_authenticated/dashboard/eventos': typeof AuthenticatedDashboardEventosRoute
   '/_authenticated/dashboard/inbox': typeof AuthenticatedDashboardInboxRoute
@@ -326,6 +345,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/dashboard'
     | '/onboarding'
+    | '/admin/aceites'
     | '/admin/clientes'
     | '/admin/configuracoes'
     | '/admin/dashboard'
@@ -339,6 +359,7 @@ export interface FileRouteTypes {
     | '/dashboard/automacoes'
     | '/dashboard/automations'
     | '/dashboard/campanhas'
+    | '/dashboard/documentos'
     | '/dashboard/empresa'
     | '/dashboard/eventos'
     | '/dashboard/inbox'
@@ -357,6 +378,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/reset-password'
     | '/onboarding'
+    | '/admin/aceites'
     | '/admin/clientes'
     | '/admin/configuracoes'
     | '/admin/dashboard'
@@ -370,6 +392,7 @@ export interface FileRouteTypes {
     | '/dashboard/automacoes'
     | '/dashboard/automations'
     | '/dashboard/campanhas'
+    | '/dashboard/documentos'
     | '/dashboard/empresa'
     | '/dashboard/eventos'
     | '/dashboard/inbox'
@@ -391,6 +414,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/_authenticated/dashboard'
     | '/_authenticated/onboarding'
+    | '/admin/aceites'
     | '/admin/clientes'
     | '/admin/configuracoes'
     | '/admin/dashboard'
@@ -404,6 +428,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/automacoes'
     | '/_authenticated/dashboard/automations'
     | '/_authenticated/dashboard/campanhas'
+    | '/_authenticated/dashboard/documentos'
     | '/_authenticated/dashboard/empresa'
     | '/_authenticated/dashboard/eventos'
     | '/_authenticated/dashboard/inbox'
@@ -540,6 +565,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminClientesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/aceites': {
+      id: '/admin/aceites'
+      path: '/aceites'
+      fullPath: '/admin/aceites'
+      preLoaderRoute: typeof AdminAceitesRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/_authenticated/onboarding': {
       id: '/_authenticated/onboarding'
       path: '/onboarding'
@@ -624,6 +656,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardEmpresaRouteImport
       parentRoute: typeof AuthenticatedDashboardRoute
     }
+    '/_authenticated/dashboard/documentos': {
+      id: '/_authenticated/dashboard/documentos'
+      path: '/documentos'
+      fullPath: '/dashboard/documentos'
+      preLoaderRoute: typeof AuthenticatedDashboardDocumentosRouteImport
+      parentRoute: typeof AuthenticatedDashboardRoute
+    }
     '/_authenticated/dashboard/campanhas': {
       id: '/_authenticated/dashboard/campanhas'
       path: '/campanhas'
@@ -660,6 +699,7 @@ interface AuthenticatedDashboardRouteChildren {
   AuthenticatedDashboardAutomacoesRoute: typeof AuthenticatedDashboardAutomacoesRoute
   AuthenticatedDashboardAutomationsRoute: typeof AuthenticatedDashboardAutomationsRoute
   AuthenticatedDashboardCampanhasRoute: typeof AuthenticatedDashboardCampanhasRoute
+  AuthenticatedDashboardDocumentosRoute: typeof AuthenticatedDashboardDocumentosRoute
   AuthenticatedDashboardEmpresaRoute: typeof AuthenticatedDashboardEmpresaRoute
   AuthenticatedDashboardEventosRoute: typeof AuthenticatedDashboardEventosRoute
   AuthenticatedDashboardInboxRoute: typeof AuthenticatedDashboardInboxRoute
@@ -680,6 +720,8 @@ const AuthenticatedDashboardRouteChildren: AuthenticatedDashboardRouteChildren =
     AuthenticatedDashboardAutomationsRoute:
       AuthenticatedDashboardAutomationsRoute,
     AuthenticatedDashboardCampanhasRoute: AuthenticatedDashboardCampanhasRoute,
+    AuthenticatedDashboardDocumentosRoute:
+      AuthenticatedDashboardDocumentosRoute,
     AuthenticatedDashboardEmpresaRoute: AuthenticatedDashboardEmpresaRoute,
     AuthenticatedDashboardEventosRoute: AuthenticatedDashboardEventosRoute,
     AuthenticatedDashboardInboxRoute: AuthenticatedDashboardInboxRoute,
@@ -716,6 +758,7 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 )
 
 interface AdminRouteChildren {
+  AdminAceitesRoute: typeof AdminAceitesRoute
   AdminClientesRoute: typeof AdminClientesRoute
   AdminConfiguracoesRoute: typeof AdminConfiguracoesRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
@@ -728,6 +771,7 @@ interface AdminRouteChildren {
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminAceitesRoute: AdminAceitesRoute,
   AdminClientesRoute: AdminClientesRoute,
   AdminConfiguracoesRoute: AdminConfiguracoesRoute,
   AdminDashboardRoute: AdminDashboardRoute,
