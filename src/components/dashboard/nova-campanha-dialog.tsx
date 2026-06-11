@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Loader2 } from "lucide-react";
-import { n8n } from "@/lib/n8n";
+import { triggerCampaignCreation } from "@/lib/n8n";
 import { useAuth } from "@/hooks/use-auth";
 
 interface Props {
@@ -42,7 +42,7 @@ export function NovaCampanhaDialog({ open, onClose, onSuccess }: Props) {
     }
     setLoading(true);
     try {
-      await n8n.createCampaign({
+      await triggerCampaignCreation({
         organization_id: (user as any)?.user_metadata?.organization_id ?? user?.id ?? "",
         ...form,
       });
@@ -87,30 +87,58 @@ export function NovaCampanhaDialog({ open, onClose, onSuccess }: Props) {
 
           <div className="space-y-1">
             <Label htmlFor="oferta">Oferta *</Label>
-            <Textarea id="oferta" name="oferta" rows={2} placeholder="O que você oferece e qual o resultado gerado" value={form.oferta} onChange={handle} />
+            <Textarea
+              id="oferta"
+              name="oferta"
+              rows={2}
+              placeholder="O que você oferece e qual o resultado gerado"
+              value={form.oferta}
+              onChange={handle}
+            />
           </div>
 
           <div className="space-y-1">
             <Label htmlFor="dores_cliente">Dores do cliente</Label>
-            <Textarea id="dores_cliente" name="dores_cliente" rows={2} placeholder="Principais problemas que você resolve" value={form.dores_cliente} onChange={handle} />
+            <Textarea
+              id="dores_cliente"
+              name="dores_cliente"
+              rows={2}
+              placeholder="Principais problemas que você resolve"
+              value={form.dores_cliente}
+              onChange={handle}
+            />
           </div>
 
           <div className="space-y-1">
             <Label htmlFor="tom_voz">Tom de voz</Label>
-            <Input id="tom_voz" name="tom_voz" placeholder="ex: Consultivo, direto, executivo" value={form.tom_voz} onChange={handle} />
+            <Input
+              id="tom_voz"
+              name="tom_voz"
+              placeholder="ex: Consultivo, direto, executivo"
+              value={form.tom_voz}
+              onChange={handle}
+            />
           </div>
 
           {error && <p className="text-sm text-destructive">{error}</p>}
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={onClose} disabled={loading}>Cancelar</Button>
+          <Button variant="outline" onClick={onClose} disabled={loading}>
+            Cancelar
+          </Button>
           <Button
             onClick={submit}
             disabled={loading}
             className="bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-glow-primary"
           >
-            {loading ? <><Loader2 className="h-4 w-4 animate-spin" /> Criando...</> : "Criar campanha"}
+            {loading ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" /> Criando...
+              </>
+            ) : (
+              "Criar campanha"
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>
