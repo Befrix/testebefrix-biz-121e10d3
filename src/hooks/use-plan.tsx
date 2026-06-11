@@ -10,8 +10,8 @@ export type PlanFeatures = {
   limits: {
     leads_per_month: number | null;
     users: number | null;
-    niches: number | null; // null = ilimitado
-    daily_contacts: number | null; // null = ilimitado
+    niches: number | null;
+    daily_contacts: number | null;
   };
   features: string[];
   channels: {
@@ -39,6 +39,7 @@ export type PlanContext = {
   tier: PlanTier;
   status: string | null;
   loading: boolean;
+  isAdmin: boolean;
   has: (flag: keyof PlanFeatures["flags"]) => boolean;
   channel: (key: keyof PlanFeatures["channels"]) => boolean;
   fieldVisible: (field: string) => boolean;
@@ -49,13 +50,30 @@ export type PlanContext = {
 export function usePlan(): PlanContext {
   const { user } = useAuth();
 
-  const { data, isLoading } = useQuery({
-    queryKey: ["current-plan", user?.id],
+  // Busca o tenant_id e se é admin via profile
+  const { data: profile } = useQuery({
+    queryKey: ["profile-tenant", user?.id],
     enabled: !!user,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("tenant_id, email")
+        .eq("id", user!.id)
+        .maybeSingle();
+      return data;
+    },
+  });
+
+  const isAdmin = profile?.email === "contato@befrix.biz";
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["current-plan", profile?.tenant_id],
+    enabled: !!profile?.tenant_id,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("subscriptions")
         .select("status, plan:planos(id, tier, name, monthly_price_cents, features)")
+        .eq("tenant_id", profile!.tenant_id)
         .order("created_at", { ascending: false })
         .limit(1)
         .maybeSingle();
@@ -64,8 +82,9 @@ export function usePlan(): PlanContext {
     },
   });
 
+  // Admin sempre tem acesso total independente de plano
   const plan = (data?.plan as Plan | null) ?? null;
-  const tier: PlanTier = (plan?.tier as PlanTier) ?? "starter";
+  const tier: PlanTier = isAdmin ? "enterprise" : ((plan?.tier as PlanTier) ?? "starter");
   const features = plan?.features;
 
   return {
@@ -73,10 +92,11 @@ export function usePlan(): PlanContext {
     tier,
     status: data?.status ?? null,
     loading: isLoading,
-    has: (flag) => Boolean(features?.flags?.[flag]),
-    channel: (key) => Boolean(features?.channels?.[key]),
-    fieldVisible: (field) => features?.lead_visible_fields?.includes(field) ?? false,
-    premiumUnlocked: (key) => Boolean(features?.lead_premium_unlocked?.[key]),
-    limit: (key) => features?.limits?.[key] ?? null,
+    isAdmin,
+    has: (flag) => isAdmin || Boolean(features?.flags?.[flag]),
+    channel: (key) => isAdmin || Boolean(features?.channels?.[key]),
+    fieldVisible: (field) => isAdmin || (features?.lead_visible_fields?.includes(field) ?? false),
+    premiumUnlocked: (key) => isAdmin || Boolean(features?.lead_premium_unlocked?.[key]),
+    limit: (key) => isAdmin ? null : (features?.limits?.[key] ?? null),
   };
 }
