@@ -105,21 +105,38 @@ function EmpresaPage() {
   const plan = usePlan();
   const qc = useQueryClient();
 
-  const { data, isLoading } = useQuery({
-    queryKey: ["perfil-empresa", user?.id],
+  // Primeiro busca o tenant_id do profile
+  const { data: profile } = useQuery({
+    queryKey: ["profile-tenant", user?.id],
     enabled: !!user,
     queryFn: async () => {
-      const [emp, icp, strat, prof] = await Promise.all([
-        supabase.from("empresas").select("*").limit(1).maybeSingle(),
-        supabase.from("icp_profiles").select("*").limit(1).maybeSingle(),
-        supabase.from("client_strategy_profiles").select("*").limit(1).maybeSingle(),
-        supabase.from("profiles").select("*").eq("id", user!.id).maybeSingle(),
-      ]);
-      return { empresa: emp.data, icp: icp.data, strategy: strat.data, profile: prof.data };
+      const { data } = await supabase
+        .from("profiles")
+        .select("tenant_id, phone, full_name, email")
+        .eq("id", user!.id)
+        .maybeSingle();
+      return data;
     },
   });
 
-  if (isLoading || !data) {
+  const { data, isLoading } = useQuery({
+    queryKey: ["perfil-empresa", profile?.tenant_id],
+    enabled: !!profile?.tenant_id,
+    queryFn: async () => {
+      const [emp, icp, strat] = await Promise.all([
+        supabase.from("empresas").select("*").eq("tenant_id", profile!.tenant_id).maybeSingle(),
+        supabase.from("icp_profiles").select("*").eq("tenant_id", profile!.tenant_id).maybeSingle(),
+        supabase.from("client_strategy_profiles").select("*").eq("tenant_id", profile!.tenant_id).maybeSingle(),
+      ]);
+      return {
+        empresa: emp.data,
+        icp: icp.data,
+        strategy: strat.data,
+      };
+    },
+  });
+
+  if (!profile || isLoading) {
     return (
       <div className="grid h-64 place-items-center">
         <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
@@ -127,7 +144,33 @@ function EmpresaPage() {
     );
   }
 
-  const refresh = () => qc.invalidateQueries({ queryKey: ["perfil-empresa", user?.id] });
+  // Se não tem registros ainda, mostra mensagem amigável
+  if (!data?.empresa) {
+    return (
+      <div className="space-y-6">
+        <header>
+          <h1 className="text-2xl font-semibold tracking-tight">Meu Perfil</h1>
+          <p className="text-sm text-muted-foreground">
+            Complete o onboarding para configurar seu perfil.
+          </p>
+        </header>
+        <div className="rounded-xl border border-border bg-secondary/20 p-8 text-center">
+          <Building2 className="mx-auto mb-3 h-10 w-10 text-muted-foreground" />
+          <p className="text-sm text-muted-foreground">
+            Nenhum dado de empresa encontrado. Complete o onboarding primeiro.
+          </p>
+          <Button
+            className="mt-4 bg-gradient-to-r from-primary to-accent text-primary-foreground"
+            onClick={() => window.location.href = "/onboarding"}
+          >
+            Ir para o Onboarding
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  const refresh = () => qc.invalidateQueries({ queryKey: ["perfil-empresa", profile.tenant_id] });
 
   return (
     <div className="space-y-6">
@@ -137,127 +180,12 @@ function EmpresaPage() {
           Revise e atualize os dados informados no onboarding. As alterações alimentam imediatamente a IA e as campanhas.
         </p>
       </header>
-
-      <SectionEmpresa initial={data.empresa} profile={data.profile} userId={user!.id} onSaved={refresh} />
-      <SectionOferta initial={data.strategy} onSaved={refresh} />
-      <SectionIcp initial={data.icp} initialStrategy={data.strategy} plan={plan} onSaved={refresh} />
-      <SectionPain initial={data.strategy} onSaved={refresh} />
-      <SectionObjetivos initial={data.strategy} onSaved={refresh} />
+      <SectionEmpresa initial={data.empresa} profile={profile} userId={user!.id} onSaved={refresh} />
+      {data.strategy && <SectionOferta initial={data.strategy} onSaved={refresh} />}
+      {data.icp && data.strategy && <SectionIcp initial={data.icp} initialStrategy={data.strategy} plan={plan} onSaved={refresh} />}
+      {data.strategy && <SectionPain initial={data.strategy} onSaved={refresh} />}
+      {data.strategy && <SectionObjetivos initial={data.strategy} onSaved={refresh} />}
     </div>
-  );
-}
-
-// ---------- Section: Empresa ----------
-const empresaSchema = z.object({
-  razao_social: z.string().trim().min(2).max(200),
-  nome_fantasia: z.string().trim().min(2).max(200),
-  cnpj: z.string().refine(isValidCNPJ, { message: "CNPJ inválido." }),
-  company_website: z.string().trim().url("URL inválida").max(255),
-  company_segment: z.string().trim().min(2).max(120),
-  company_size: z.enum(sizes),
-  faturamento_anual: z.enum(faturamentoOpts),
-  phone: z.string().trim().min(8).max(40),
-});
-type EmpresaForm = z.input<typeof empresaSchema>;
-
-function SectionEmpresa({ initial, profile, userId, onSaved }: { initial: any; profile: any; userId: string; onSaved: () => void }) {
-  const [saving, setSaving] = useState(false);
-  const form = useForm<EmpresaForm>({
-    resolver: zodResolver(empresaSchema),
-    defaultValues: {
-      razao_social: initial?.razao_social ?? "",
-      nome_fantasia: initial?.nome_fantasia ?? initial?.company_name ?? "",
-      cnpj: initial?.cnpj ? maskCNPJ(initial.cnpj) : "",
-      company_website: initial?.company_website ?? "",
-      company_segment: initial?.company_segment ?? "",
-      company_size: (initial?.company_size as EmpresaForm["company_size"]) ?? "11-50",
-      faturamento_anual: (initial?.faturamento_anual as EmpresaForm["faturamento_anual"]) ?? "Até R$ 500 mil",
-      phone: profile?.phone ?? "",
-    },
-  });
-  const { register, handleSubmit, setValue, watch, formState: { errors } } = form;
-  useEffect(() => {
-    form.reset({
-      razao_social: initial?.razao_social ?? "",
-      nome_fantasia: initial?.nome_fantasia ?? initial?.company_name ?? "",
-      cnpj: initial?.cnpj ? maskCNPJ(initial.cnpj) : "",
-      company_website: initial?.company_website ?? "",
-      company_segment: initial?.company_segment ?? "",
-      company_size: (initial?.company_size as EmpresaForm["company_size"]) ?? "11-50",
-      faturamento_anual: (initial?.faturamento_anual as EmpresaForm["faturamento_anual"]) ?? "Até R$ 500 mil",
-      phone: profile?.phone ?? "",
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initial, profile]);
-  const cnpjV = watch("cnpj"); const sizeV = watch("company_size"); const fatV = watch("faturamento_anual");
-
-  const onSubmit = async (v: EmpresaForm) => {
-    setSaving(true);
-    const [empRes, profRes] = await Promise.all([
-      supabase.from("empresas").update({
-        razao_social: v.razao_social,
-        nome_fantasia: v.nome_fantasia,
-        company_name: v.nome_fantasia,
-        cnpj: onlyDigits(v.cnpj),
-        company_website: v.company_website,
-        company_segment: v.company_segment,
-        company_size: v.company_size,
-        faturamento_anual: v.faturamento_anual,
-      }).eq("id", initial.id),
-      supabase.from("profiles").update({ phone: v.phone }).eq("id", userId),
-    ]);
-    setSaving(false);
-    if (empRes.error) return toast.error(empRes.error.message);
-    if (profRes.error) return toast.error(profRes.error.message);
-    toast.success("✅ Informações atualizadas com sucesso.");
-    onSaved();
-  };
-
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2"><Building2 className="h-4 w-4 text-primary-glow" /> Empresa</CardTitle>
-        <CardDescription>Razão social, CNPJ, website, segmento, colaboradores e faturamento.</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit(onSubmit, () => toast.error("Complete os campos obrigatórios para continuar."))} noValidate>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <Field label="Razão Social" required error={errors.razao_social?.message}>
-              <Input {...register("razao_social")} />
-            </Field>
-            <Field label="Nome Fantasia" required error={errors.nome_fantasia?.message}>
-              <Input {...register("nome_fantasia")} />
-            </Field>
-            <Field label="CNPJ" required error={errors.cnpj?.message}>
-              <Input value={cnpjV} inputMode="numeric" maxLength={18}
-                onChange={(e) => setValue("cnpj", maskCNPJ(e.target.value), { shouldValidate: true })} />
-            </Field>
-            <Field label="Website" required error={errors.company_website?.message}>
-              <Input {...register("company_website")} placeholder="https://..." />
-            </Field>
-            <Field label="Segmento" required error={errors.company_segment?.message}>
-              <Input {...register("company_segment")} />
-            </Field>
-            <Field label="Colaboradores" required error={errors.company_size?.message}>
-              <Select value={sizeV} onValueChange={(v) => setValue("company_size", v as EmpresaForm["company_size"], { shouldValidate: true })}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>{sizes.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
-              </Select>
-            </Field>
-            <Field label="Faturamento anual" required error={errors.faturamento_anual?.message}>
-              <Select value={fatV} onValueChange={(v) => setValue("faturamento_anual", v as EmpresaForm["faturamento_anual"], { shouldValidate: true })}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>{faturamentoOpts.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
-              </Select>
-            </Field>
-            <Field label="Telefone" required error={errors.phone?.message}>
-              <Input {...register("phone")} />
-            </Field>
-          </div>
-          <SaveButton saving={saving} />
-        </form>
-      </CardContent>
-    </Card>
   );
 }
 
