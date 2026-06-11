@@ -37,6 +37,18 @@ export type Feedback = {
   feedback_date: string;
 };
 
+export type Campaign = {
+  id: string;
+  name: string;
+  status: string;
+  campaign_type: string | null;
+  niche: string | null;
+  total_sent: number;
+  total_replies: number;
+  total_meetings: number;
+  created_at: string;
+};
+
 export function useWorkspaceData() {
   const { user } = useAuth();
 
@@ -48,14 +60,17 @@ export function useWorkspaceData() {
         supabase.from("leads").select("*").order("created_at", { ascending: false }),
         supabase.from("outreach_logs").select("*").order("created_at", { ascending: false }),
         supabase.from("meeting_feedback").select("*").order("feedback_date", { ascending: false }),
-        supabase.from("campanhas").select("*").order("created_at", { ascending: false }),
+        supabase
+          .from("campaigns")
+          .select("id, name, status, campaign_type, niche, total_sent, total_replies, total_meetings, created_at")
+          .order("created_at", { ascending: false }),
         supabase.from("financeiro").select("*"),
       ]);
 
       const leads = (leadsRes.data ?? []) as Lead[];
       const outreach = (outreachRes.data ?? []) as OutreachLog[];
       const feedback = (feedbackRes.data ?? []) as Feedback[];
-      const campanhas = campanhasRes.data ?? [];
+      const campanhas = (campanhasRes.data ?? []) as Campaign[];
       const financeiro = financeiroRes.data ?? [];
 
       // KPIs
