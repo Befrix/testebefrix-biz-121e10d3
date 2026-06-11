@@ -1,9 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 import { Loader2, Megaphone, Plus } from "lucide-react";
 import { PageHeader, SectionCard, StatusPill, EmptyState } from "@/components/dashboard/primitives";
 import { Button } from "@/components/ui/button";
 import { useWorkspaceData } from "@/hooks/use-workspace-data";
 import { formatNumber } from "@/lib/dashboard";
+import { NovaCampanhaDialog } from "@/components/dashboard/nova-campanha-dialog";
 
 export const Route = createFileRoute("/_authenticated/dashboard/campanhas")({
   component: CampanhasPage,
@@ -19,6 +21,8 @@ const STATUS_TONE: Record<string, string> = {
 
 function CampanhasPage() {
   const { data, isLoading } = useWorkspaceData();
+  const [dialogOpen, setDialogOpen] = useState(false);
+
   const campanhas = (data?.campanhas ?? []) as Array<{
     id: string;
     name: string;
@@ -34,10 +38,19 @@ function CampanhasPage() {
         description="Orquestre disparos outbound por canal."
         icon={Megaphone}
         action={
-          <Button className="bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-glow-primary">
+          <Button
+            onClick={() => setDialogOpen(true)}
+            className="bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-glow-primary"
+          >
             <Plus className="h-4 w-4" /> Nova campanha
           </Button>
         }
+      />
+
+      <NovaCampanhaDialog
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        onSuccess={() => window.location.reload()}
       />
 
       {isLoading ? (
