@@ -1,3 +1,4 @@
+import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -35,26 +36,33 @@ export function NovaCampanhaDialog({ open, onClose, onSuccess }: Props) {
   }
 
   async function submit() {
-    setError(null);
-    if (!form.niche || !form.oferta) {
-      setError("Preencha pelo menos Nicho e Oferta.");
-      return;
-    }
-    setLoading(true);
-    try {
-      await triggerCampaignCreation({
-        organization_id: (user as any)?.user_metadata?.organization_id ?? user?.id ?? "",
-        ...form,
-      });
-      setForm(INITIAL);
-      onSuccess?.();
-      onClose();
-    } catch (err: any) {
-      setError(err.message ?? "Erro ao criar campanha. Verifique a conexão com o N8N.");
-    } finally {
-      setLoading(false);
-    }
+  setError(null);
+  if (!form.niche || !form.oferta) {
+    setError("Preencha pelo menos Nicho e Oferta.");
+    return;
   }
+  setLoading(true);
+  try {
+    // Busca o tenant_id correto
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("tenant_id")
+      .eq("id", user!.id)
+      .maybeSingle();
+
+    await triggerCampaignCreation({
+      organization_id: profile?.tenant_id ?? user?.id ?? "",
+      ...form,
+    });
+    setForm(INITIAL);
+    onSuccess?.();
+    onClose();
+  } catch (err: any) {
+    setError(err.message ?? "Erro ao criar campanha. Verifique a conexão com o N8N.");
+  } finally {
+    setLoading(false);
+  }
+}
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
